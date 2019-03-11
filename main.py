@@ -3,7 +3,7 @@ from Population import Population
 from random import randint
 
 POPULATION_SIZE = 100
-NUM_ZONES = 29
+NUM_ZONES = 5
 NUM_STEPS = 5
 
 def simulate(population):
@@ -11,12 +11,12 @@ def simulate(population):
         population.evolve()
 
 def main():
-    population = Population()
+    population = Population(NUM_ZONES)
 
-    population.init_random_population(POPULATION_SIZE, NUM_ZONES)
+    population.init_random_population(POPULATION_SIZE)
     print(population)
-
-    simulate(population)
+    population.get_odm()
+    #simulate(population)
   
 if __name__== "__main__":
     main()

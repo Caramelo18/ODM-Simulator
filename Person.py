@@ -1,6 +1,9 @@
+from random import randint
+
 class Person:
     def __init__(self, zone):
         self.origin = zone
+        self.destination = randint(1, 5)
         self.step = 0
 
     def __str__(self):
@@ -14,6 +17,9 @@ class Person:
     
     def get_origin(self):
         return self.origin
+
+    def get_destination(self):
+        return self.destination
     
     def get_step(self):
         return self.step
