@@ -15,6 +15,16 @@ class Population:
         for _ in range(size):
             p = Person(randint(1, self.num_zones))
             self.add_person(p)
+    
+    def init_population(self, data):
+        for section_id in data:
+            section_data = data[section_id]
+            for classes in section_data:
+                amount = section_data[classes]
+                for _ in range(amount):
+                    p = Person(section_id)
+                    self.add_person(p)
+                
 
     def __str__(self):
         length = len(self.persons)

@@ -5,7 +5,7 @@ import Loader
 from random import randint
 
 POPULATION_SIZE = 100
-NUM_SECTIONS = 5
+NUM_SECTIONS = 29
 NUM_STEPS = 5
 
 def simulate(population):
@@ -14,13 +14,16 @@ def simulate(population):
 
 def main():
     population = Population(NUM_SECTIONS)
-    sections = Loader.load_sections('sections.csv')
-    print(sections)
+    data = Loader.load_population_data('2011census.csv')
+    population.init_population(data)
 
-    population.init_random_population(POPULATION_SIZE)
-    print(population)
+    # sections = Loader.load_sections('sections.csv')
+    # print(sections)
+
+    # population.init_random_population(POPULATION_SIZE)
+    # print(population)
     population.get_odm()
-    #simulate(population)
+    # simulate(population)
   
 if __name__== "__main__":
     main()

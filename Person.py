@@ -3,7 +3,7 @@ from random import randint
 class Person:
     def __init__(self, zone):
         self.origin = zone
-        self.destination = randint(1, 5)
+        self.destination = randint(1, 29)
         self.step = 0
 
     def __str__(self):
