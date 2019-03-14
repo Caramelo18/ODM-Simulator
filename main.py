@@ -13,17 +13,18 @@ def simulate(population):
         population.evolve()
 
 def main():
-    population = Population(NUM_SECTIONS)
-    data = Loader.load_population_data('2011census.csv')
-    population.init_population(data)
+    # population = Population(NUM_SECTIONS)
+    # data = Loader.load_population_data('2011census.csv')
+    # population.init_population(data)
 
     # sections = Loader.load_sections('sections.csv')
     # print(sections)
 
     # population.init_random_population(POPULATION_SIZE)
     # print(population)
-    population.get_odm()
+    # population.get_odm()
     # simulate(population)
+    Loader.load_shapefile('pombal.shp')
   
 if __name__== "__main__":
     main()
