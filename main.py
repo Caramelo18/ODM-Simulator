@@ -1,6 +1,7 @@
 from Person import Person
 from Population import Population
 import Loader
+import DataGenerator
 
 from random import randint
 
@@ -24,7 +25,8 @@ def main():
     # print(population)
     # population.get_odm()
     # simulate(population)
-    Loader.load_shapefile('pombal.shp')
+    # Loader.load_shapefile('pombal.shp')
+    DataGenerator.load_od_reg("fake-data.csv")
   
 if __name__== "__main__":
     main()

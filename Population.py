@@ -1,30 +1,25 @@
 from Person import Person
 from random import randint
+from Enums import PersonClass, Schools
 import collections
+from PIL import Image
+import numpy as np
+from matplotlib import pyplot as plt
+
 
 class Population:
-    def __init__(self, num_zones):
+    def __init__(self, num_places):
         self.persons = []
-        self.num_zones = num_zones
+        self.num_places = num_places
         self.step = 0
 
     def add_person(self, person):
         self.persons.append(person)
 
-    def init_random_population(self, size):
-        for _ in range(size):
-            p = Person(randint(1, self.num_zones))
-            self.add_person(p)
-    
-    def init_population(self, data):
-        for section_id in data:
-            section_data = data[section_id]
-            for classes in section_data:
-                amount = section_data[classes]
-                for _ in range(amount):
-                    p = Person(section_id)
-                    self.add_person(p)
-                
+    def add_batch(self, size, origin, destination, person_class = PersonClass.CLASS1):
+        for i in range(size):
+            p = Person(origin, destination, person_class)
+            self.add_person(p)                
 
     def __str__(self):
         length = len(self.persons)
@@ -42,7 +37,7 @@ class Population:
         print(self)
     
     def get_odm(self):
-        od = [[0 for i in range(self.num_zones + 1)] for j in range(self.num_zones + 1)]
+        od = [[0 for i in range(self.num_places + 1)] for j in range(self.num_places + 1)]
 
         for i in range(len(od)):
             od[0][i] = i
@@ -53,5 +48,29 @@ class Population:
             destination = person.get_destination()
             od[origin][destination] += 1
             
-        for line in od:
-            print(line)
+        # for line in od:
+        #     print(line)
+    
+        plt.imshow(od, interpolation='nearest')
+        plt.show()
+
+    def get_person_class_by_school(self, school):
+        if school == Schools.SCH_1:
+            return PersonClass.CLASS2
+        elif school == Schools.SCH_SUP:
+            return PersonClass.CLASS4
+        
+        return PersonClass.CLASS3
+
+    def get_persons_by_class(self, person_class):
+        persons = []
+        for person in self.persons:
+            if person.get_person_class() == person_class:
+                persons.append(person)
+        
+        return (len(persons), persons)
+
+    def get_population_classes_stats(self):
+        for person_class in PersonClass:
+            (size, _) = self.get_persons_by_class(person_class)
+            print(person_class, size, sep = " - ")
