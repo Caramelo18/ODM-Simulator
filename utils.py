@@ -1,4 +1,5 @@
 import pandas
+import random
 
 basepath = 'data/'
 
@@ -44,6 +45,23 @@ def merge_ss():
     df.to_csv('data/census-lug11.csv')
     
     print(df)
+
+def roulette(probabilites):
+    length = len(probabilites)
+    prob = probabilites.copy()
+
+    for i in range(1, length):
+        prob[i] = prob[i - 1] + prob[i]
+        
+    rand = random.random()
+
+    d = 0
+    for i in range(1, len(prob)):
+        if rand >= prob[i - 1] and rand <= prob[i]:
+            d = i
+            break
+    
+    print(d)
 
 
 def main():

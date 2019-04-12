@@ -74,3 +74,13 @@ class Population:
         for person_class in PersonClass:
             (size, _) = self.get_persons_by_class(person_class)
             print(person_class, size, sep = " - ")
+
+    def plot_population_by_age(self):
+        ages = []
+        for person in self.persons:
+            ages.append(person.get_age())
+
+        plt.hist(ages, bins="auto")
+        plt.xlabel("Age")
+        plt.ylabel("Number of Persons")
+        plt.show()

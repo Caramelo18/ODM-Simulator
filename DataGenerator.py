@@ -50,7 +50,7 @@ def load_od_reg(filename):
     work_pop = 0.4
     ret_pop = 0.15
 
-    for i, row in df.iterrows():
+    for _, row in df.iterrows():
         num_pop = row['POPULATION']
         num_chld = int(num_pop * chld_pop)
         num_stud = int(num_pop * stud_pop)
@@ -96,8 +96,7 @@ def load_od_reg(filename):
         population.add_batch(size = num_ret, origin = home_loc, destination = elder_locs[0], person_class=PersonClass.CLASS7)
 
 
-    # population.get_odm()
+    return population
 
-    population.get_persons_by_class(PersonClass.CLASS3)
-    population.get_population_classes_stats()
-    print(population)
+def guess_age(person_class):
+    return 1
