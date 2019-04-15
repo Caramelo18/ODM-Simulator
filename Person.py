@@ -47,4 +47,4 @@ class Person:
             return randint(36, 50)
         elif self.person_class == PersonClass.CLASS6:
             return randint(51, 64)
-        return np.random.normal(75, 10)
+        return int(np.random.normal(80, 10))

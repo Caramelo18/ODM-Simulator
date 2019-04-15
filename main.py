@@ -4,15 +4,13 @@ from Stats import Stats
 import Loader
 import DataGenerator
 from random import randint
-from Enums import *
 import Parser
 import utils
-
 import matplotlib.pyplot as plt
 
 POPULATION_SIZE = 100
 NUM_SECTIONS = 29
-NUM_STEPS = 1
+NUM_STEPS = 2
 
 def simulate(population):
     for _ in range(NUM_STEPS):
@@ -34,10 +32,13 @@ def main():
     mortality_data = Parser.get_mortality_data()
     
     population = DataGenerator.load_od_reg("fake-data.csv")
+    population.set_mortality(mortality_data)
 
     stats = Stats(population)
     
-    stats.get_population_classes_stats()
+    # stats.get_population_classes_stats()
+
+    simulate(population)
     # stats.plot_population_by_age()
 
   

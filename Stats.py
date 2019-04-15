@@ -24,7 +24,7 @@ class Stats:
         for person in self.population.get_persons():
             ages.append(person.get_age())
 
-        plt.hist(ages, bins="auto")
+        plt.hist(ages, bins=100)
         plt.xlabel("Age")
         plt.ylabel("Number of Persons")
         plt.show()

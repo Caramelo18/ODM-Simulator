@@ -4,6 +4,8 @@ from Enums import PersonClass, Schools
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
+import utils
+import random
 
 # Data from January 2019 for "Região de Leiria"
 DEATHS_PER_MONTH = 383
@@ -19,28 +21,73 @@ class Population:
 
     def get_persons(self):
         return self.persons
+    
+    def get_population_size(self):
+        return len(self.persons)
+
+    def set_mortality(self, data):
+        self.mortality_probabilites = data
 
     def add_person(self, person):
         self.persons.append(person)
 
     def add_batch(self, size, origin, destination, person_class = PersonClass.CLASS1):
-        for i in range(size):
+        for _ in range(size):
             p = Person(origin, destination, person_class)
-            self.add_person(p)                
+            self.add_person(p)
+
+    def remove_person(self, person):
+        self.persons.remove(person)
 
     def __str__(self):
         length = len(self.persons)
 
-        ret = 'Step {} - Population contains {} persons'.format(self.step, length)
+        ret = 'Step {} - Population contains {} persons'.format(self.step_num, length)
         return ret
 
     def step(self):
         for person in self.persons:
             person.evolve()
 
+        self.simulate_mortality()
         self.step_num += 1
 
         print(self)
+
+    def simulate_mortality(self):
+        if self.mortality_probabilites is None:
+            print("No mortality data loaded")
+            exit(1)
+
+        deaths_per_year = DEATHS_PER_MONTH*12
+        death_percentage = deaths_per_year/REG_LEIRIA_POP
+        num_deaths = int(self.get_population_size() * death_percentage)
+
+        death_ages = []
+        while num_deaths > 0:
+            age = utils.roulette(self.mortality_probabilites)
+            death_ages.append(age)
+            d_person = self.get_random_person_by_age(age)
+            self.remove_person(d_person)
+            num_deaths -= 1
+
+        print("Step {} - {} persons are now dead".format(self.step_num, len(death_ages)))
+        # plt.hist(death_ages, bins="auto")
+        # plt.xlabel("Age")
+        # plt.ylabel("Number of Persons")
+        # plt.show()
+
+
+    def get_random_person_by_age(self, age):
+        possible_persons = []
+        for person in self.persons:
+            if person.get_age() == age:
+                possible_persons.append(person)
+        
+        random.shuffle(possible_persons)
+
+        return possible_persons[0]
+        
     
     def get_odm(self):
         od = [[0 for i in range(self.num_places + 1)] for j in range(self.num_places + 1)]

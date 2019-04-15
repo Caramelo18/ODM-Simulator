@@ -26,11 +26,11 @@ def get_mortality_data():
         total += num
 
     probabilites = []
-    indexes = np.arange(len(data))
     
     for age in data:
         probabilites.append(data[age]/total)
 
+    # indexes = np.arange(len(data))
     # plt.bar(indexes, probabilites)
     # plt.show()
 
