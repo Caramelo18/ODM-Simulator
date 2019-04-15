@@ -1,17 +1,24 @@
 from Person import Person
 from random import randint
 from Enums import PersonClass, Schools
-import collections
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
 
+# Data from January 2019 for "Região de Leiria"
+DEATHS_PER_MONTH = 383
+DEATHS_PER_MONTH_M = 196
+DEATHS_PER_MONTH_F = 187
+REG_LEIRIA_POP = 294632
 
 class Population:
     def __init__(self, num_places):
         self.persons = []
         self.num_places = num_places
-        self.step = 0
+        self.step_num = 0
+
+    def get_persons(self):
+        return self.persons
 
     def add_person(self, person):
         self.persons.append(person)
@@ -24,15 +31,14 @@ class Population:
     def __str__(self):
         length = len(self.persons)
 
-        
         ret = 'Step {} - Population contains {} persons'.format(self.step, length)
         return ret
 
-    def evolve(self):
+    def step(self):
         for person in self.persons:
             person.evolve()
 
-        self.step += 1
+        self.step_num += 1
 
         print(self)
     
@@ -54,33 +60,3 @@ class Population:
         plt.imshow(od, interpolation='nearest')
         plt.show()
 
-    def get_person_class_by_school(self, school):
-        if school == Schools.SCH_1:
-            return PersonClass.CLASS2
-        elif school == Schools.SCH_SUP:
-            return PersonClass.CLASS4
-        
-        return PersonClass.CLASS3
-
-    def get_persons_by_class(self, person_class):
-        persons = []
-        for person in self.persons:
-            if person.get_person_class() == person_class:
-                persons.append(person)
-        
-        return (len(persons), persons)
-
-    def get_population_classes_stats(self):
-        for person_class in PersonClass:
-            (size, _) = self.get_persons_by_class(person_class)
-            print(person_class, size, sep = " - ")
-
-    def plot_population_by_age(self):
-        ages = []
-        for person in self.persons:
-            ages.append(person.get_age())
-
-        plt.hist(ages, bins="auto")
-        plt.xlabel("Age")
-        plt.ylabel("Number of Persons")
-        plt.show()

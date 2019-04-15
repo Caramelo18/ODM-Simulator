@@ -62,6 +62,7 @@ def roulette(probabilites):
             break
     
     print(d)
+    return d
 
 
 def main():
