@@ -65,10 +65,14 @@ class Population:
 
         death_ages = []
         while num_deaths > 0:
-            age = utils.roulette(self.mortality_probabilites)
-            death_ages.append(age)
-            d_person = self.get_random_person_by_age(age)
+            age = None
+            d_person = None
+            while d_person is None:
+                age = utils.roulette(self.mortality_probabilites)
+                d_person = self.get_random_person_by_age(age)
+            
             self.remove_person(d_person)
+            death_ages.append(age)
             num_deaths -= 1
 
         print("Step {} - {} persons are now dead".format(self.step_num, len(death_ages)))
@@ -85,6 +89,9 @@ class Population:
                 possible_persons.append(person)
         
         random.shuffle(possible_persons)
+        
+        if len(possible_persons) is 0:
+            return None
 
         return possible_persons[0]
         
