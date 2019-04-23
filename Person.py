@@ -3,12 +3,12 @@ from Enums import *
 import numpy as np
 
 class Person:
-    def __init__(self, origin, destination, person_class):
+    def __init__(self, origin, destination, person_class, age=None):
         self.origin = origin
         self.destination = destination
         self.person_class = person_class
         self.step = 0
-        self.age = self.guess_age()
+        self.age = age if age is not None else self.guess_age()
 
     def __str__(self):
         return 'Oi'

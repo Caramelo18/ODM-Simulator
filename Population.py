@@ -11,7 +11,15 @@ import random
 DEATHS_PER_MONTH = 383
 DEATHS_PER_MONTH_M = 196
 DEATHS_PER_MONTH_F = 187
+
+# Data from 2017 for "Pombal" municipality - use yearly data because fluctuations during years
+BIRTHS_PER_YEAR = 336
+BIRTHS_PER_YEAR_M = 166
+BIRTHS_PER_YEAR_F = 170
+
 REG_LEIRIA_POP = 294632
+MUN_POMB_POP = 55217
+FREG_POMB_POP = 17187
 
 class Population:
     def __init__(self, num_places):
@@ -26,7 +34,11 @@ class Population:
         return len(self.persons)
 
     def set_mortality(self, data):
+        print(data)
         self.mortality_probabilites = data
+
+    def set_natality(self, data):
+        self.natality_probabilites = data
 
     def add_person(self, person):
         self.persons.append(person)
@@ -50,16 +62,17 @@ class Population:
             person.evolve()
 
         self.simulate_mortality()
-        self.step_num += 1
+        self.simulate_natality()
 
         print(self)
+        self.step_num += 1
 
     def simulate_mortality(self):
         if self.mortality_probabilites is None:
             print("No mortality data loaded")
             exit(1)
 
-        deaths_per_year = DEATHS_PER_MONTH*12
+        deaths_per_year = DEATHS_PER_MONTH * 12
         death_percentage = deaths_per_year/REG_LEIRIA_POP
         num_deaths = int(self.get_population_size() * death_percentage)
 
@@ -81,6 +94,16 @@ class Population:
         # plt.ylabel("Number of Persons")
         # plt.show()
 
+    def simulate_natality(self):
+        births_per_year = int(BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP)
+
+        for _ in range(births_per_year):
+            origin = randint(0, 20)
+            destination = 32
+            person = Person(origin, destination, PersonClass.CLASS1, 0)
+            self.add_person(person)
+
+        print("Step {} - {} persons were born".format(self.step_num, births_per_year))
 
     def get_random_person_by_age(self, age):
         possible_persons = []

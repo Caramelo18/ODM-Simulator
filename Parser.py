@@ -57,3 +57,26 @@ def get_mortality_data():
     print(mean, sd)
     plt.plot(x, y)
     plt.show()
+
+def get_natality_data():
+    soup = BeautifulSoup(open("data/natalidade_simple.html"), 'html.parser')
+
+    table = soup.find_all(class_="dados")[0]
+    table = table.find("tbody")
+    table = table.find_all(class_=["TRow1"])[0]
+    table = table.find_all("td")
+
+    total_births = table[2].text
+    births_10_14 = table[3].text
+    births_15_19 = table[4].text
+    births_20_24 = table[5].text
+    births_25_29 = table[6].text
+    births_30_34 = table[7].text
+    births_35_39 = table[8].text
+    births_40_44 = table[9].text
+    births_45_49 = table[10].text
+    births_50_more = table[11].text
+
+    data = {'total_births': total_births, 'births_10_14': births_10_14, 'births_15_19': births_15_19, 'births_20_24': births_20_24, 'births_25_29': births_25_29, 'births_30_34': births_30_34, 'births_35_39': births_35_39, 'births_40_44': births_40_44, 'births_45_49': births_45_49, 'births_50_more': births_50_more}
+    
+    return data
