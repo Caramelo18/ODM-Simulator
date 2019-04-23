@@ -7,12 +7,12 @@ from matplotlib import pyplot as plt
 import utils
 import random
 
-# Data from January 2019 for "Região de Leiria"
-DEATHS_PER_MONTH = 383
-DEATHS_PER_MONTH_M = 196
-DEATHS_PER_MONTH_F = 187
+# Data from 2017 for "freguesia de Pombal" 
+DEATHS_PER_YEAR = 183
+DEATHS_PER_YEAR_M = 99
+DEATHS_PER_YEAR_F = 84
 
-# Data from 2017 for "Pombal" municipality - use yearly data because fluctuations during years
+# Data from 2017 for "Pombal" municipality - use yearly data because fluctuations during months
 BIRTHS_PER_YEAR = 336
 BIRTHS_PER_YEAR_M = 166
 BIRTHS_PER_YEAR_F = 170
@@ -34,7 +34,6 @@ class Population:
         return len(self.persons)
 
     def set_mortality(self, data):
-        print(data)
         self.mortality_probabilites = data
 
     def set_natality(self, data):
@@ -68,13 +67,17 @@ class Population:
         self.step_num += 1
 
     def simulate_mortality(self):
-        if self.mortality_probabilites is None:
-            print("No mortality data loaded")
+        try:
+            self.mortality_probabilites
+        except AttributeError:
+            print("ERROR: No mortality data loaded")
             exit(1)
 
-        deaths_per_year = DEATHS_PER_MONTH * 12
-        death_percentage = deaths_per_year/REG_LEIRIA_POP
+        death_percentage = DEATHS_PER_YEAR / FREG_POMB_POP
         num_deaths = int(self.get_population_size() * death_percentage)
+
+        rand = int(np.random.normal(0, int(num_deaths * 0.05)))
+        num_deaths += rand
 
         death_ages = []
         while num_deaths > 0:
@@ -95,15 +98,25 @@ class Population:
         # plt.show()
 
     def simulate_natality(self):
-        births_per_year = int(BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP)
+        try:
+            self.natality_probabilites
+        except AttributeError:
+            print("ERROR: No natality data loaded")
+            exit(1)
+            
+        births = int(BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP)
+        rand = int(np.random.normal(0, int(births * 0.05)))
+        
+        births += rand
 
-        for _ in range(births_per_year):
+
+        for _ in range(births):
             origin = randint(0, 20)
             destination = 32
             person = Person(origin, destination, PersonClass.CLASS1, 0)
             self.add_person(person)
 
-        print("Step {} - {} persons were born".format(self.step_num, births_per_year))
+        print("Step {} - {} persons were born".format(self.step_num, births))
 
     def get_random_person_by_age(self, age):
         possible_persons = []

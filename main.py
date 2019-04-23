@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 POPULATION_SIZE = 100
 NUM_SECTIONS = 29
-NUM_STEPS = 1
+NUM_STEPS = 2
 
 def simulate(population):
     for _ in range(NUM_STEPS):
@@ -34,13 +34,14 @@ def main():
     
     population = DataGenerator.load_od_reg("fake-data.csv")
     population.set_mortality(mortality_data)
+    population.set_natality(natality_data)
 
     stats = Stats(population)
     
     # stats.get_population_classes_stats()
 
     simulate(population)
-    stats.plot_population_by_age()
+    # stats.plot_population_by_age()
 
   
 if __name__== "__main__":
