@@ -21,6 +21,8 @@ REG_LEIRIA_POP = 294632
 MUN_POMB_POP = 55217
 FREG_POMB_POP = 17187
 
+BIRTH_RANGES = [(10,14), (15,19), (20,24), (25,29), (30,34), (35,39), (40,44), (45,49), (50,120)]
+
 class Population:
     def __init__(self, num_places):
         self.persons = []
@@ -37,7 +39,16 @@ class Population:
         self.mortality_probabilites = data
 
     def set_natality(self, data):
-        self.natality_probabilites = data
+        keys = list(data)
+        total_births = int(data[keys[0]])
+        probabilities = []
+        
+        for i in range(1, len(keys)):
+            num_births = int(data[keys[i]])
+            prob = num_births/total_births
+            probabilities.append(prob)
+
+        self.natality_probabilites = probabilities
 
     def add_person(self, person):
         self.persons.append(person)
@@ -108,12 +119,16 @@ class Population:
         rand = int(np.random.normal(0, int(births * 0.05)))
         
         births += rand
-
+        
+        places = []
 
         for _ in range(births):
-            origin = randint(0, 20)
             destination = 32
-            person = Person(origin, destination, PersonClass.CLASS1, 0)
+            (min_age, max_age) = BIRTH_RANGES[utils.roulette(self.natality_probabilites)]
+            mother = self.get_random_person_in_age_range(min_age, max_age)
+            mother_place = mother.get_origin()
+            places.append(mother_place)
+            person = Person(mother_place, destination, PersonClass.CLASS1, 0)
             self.add_person(person)
 
         print("Step {} - {} persons were born".format(self.step_num, births))
@@ -124,6 +139,19 @@ class Population:
             if person.get_age() == age:
                 possible_persons.append(person)
         
+        random.shuffle(possible_persons)
+        
+        if len(possible_persons) is 0:
+            return None
+
+        return possible_persons[0]
+    
+    def get_random_person_in_age_range(self, min_age, max_age):
+        possible_persons = []
+        for person in self.persons:
+            if person.get_age() >= min_age and person.get_age() <= max_age:
+                possible_persons.append(person)
+
         random.shuffle(possible_persons)
         
         if len(possible_persons) is 0:

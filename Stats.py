@@ -28,3 +28,7 @@ class Stats:
         plt.xlabel("Age")
         plt.ylabel("Number of Persons")
         plt.show()
+
+    def show_histogram(self, data):
+        plt.hist(data)
+        plt.show()
