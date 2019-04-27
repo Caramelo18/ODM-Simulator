@@ -1,5 +1,6 @@
 import pandas
 import random
+import numpy as np
 
 basepath = 'data/'
 
@@ -62,6 +63,11 @@ def roulette(probabilites):
             break
     
     return d
+
+def generate_ages_by_probabilites(probabilites, k=1):
+    age_range = np.arange(len(probabilites))
+    ages = random.choices(age_range, probabilites, k = k)
+    return ages
 
 
 def main():

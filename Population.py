@@ -17,6 +17,9 @@ BIRTHS_PER_YEAR = 336
 BIRTHS_PER_YEAR_M = 166
 BIRTHS_PER_YEAR_F = 170
 
+# Data from 2017 for "Pombal" municipality
+MIGRATORY_BALANCE = -250
+
 REG_LEIRIA_POP = 294632
 MUN_POMB_POP = 55217
 FREG_POMB_POP = 17187
@@ -90,17 +93,17 @@ class Population:
         rand = int(np.random.normal(0, int(num_deaths * 0.05)))
         num_deaths += rand
 
-        death_ages = []
-        while num_deaths > 0:
-            age = None
-            d_person = None
+        death_ages = utils.generate_ages_by_probabilites(self.mortality_probabilites, num_deaths)
+        
+        for i in range(len(death_ages)):
+            age = death_ages[i]
+            d_person = self.get_random_person_by_age(age)
             while d_person is None:
-                age = utils.roulette(self.mortality_probabilites)
+                age = utils.generate_ages_by_probabilites(self.mortality_probabilites)[0]
                 d_person = self.get_random_person_by_age(age)
-            
-            self.remove_person(d_person)
-            death_ages.append(age)
-            num_deaths -= 1
+                if d_person is not None:
+                    death_ages[i] = age 
+            self.remove_person(d_person)        
 
         print("Step {} - {} persons are now dead".format(self.step_num, len(death_ages)))
         # plt.hist(death_ages, bins="auto")
@@ -120,18 +123,21 @@ class Population:
         
         births += rand
         
-        places = []
+        newborns_places = []
 
-        for _ in range(births):
-            destination = 32
-            (min_age, max_age) = BIRTH_RANGES[utils.roulette(self.natality_probabilites)]
+        mothers_age_ranges = utils.generate_ages_by_probabilites(self.natality_probabilites, births)
+
+        for age_range in mothers_age_ranges:
+            (min_age, max_age) = BIRTH_RANGES[age_range]
             mother = self.get_random_person_in_age_range(min_age, max_age)
             mother_place = mother.get_origin()
-            places.append(mother_place)
+            destination = 32
+            newborns_places.append(mother_place)
             person = Person(mother_place, destination, PersonClass.CLASS1, 0)
             self.add_person(person)
 
-        print("Step {} - {} persons were born".format(self.step_num, births))
+
+        print("Step {} - {} persons were born".format(self.step_num, len(mothers_age_ranges)))
 
     def get_random_person_by_age(self, age):
         possible_persons = []
