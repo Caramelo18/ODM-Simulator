@@ -1,6 +1,6 @@
-from Population import Population
 from matplotlib import pyplot as plt
 from Enums import PersonClass
+import statistics
 
 class Stats:
     def __init__(self, population):
@@ -29,6 +29,25 @@ class Stats:
         plt.ylabel("Number of Persons")
         plt.show()
 
+    def get_population_age_stats(self):
+        ages = []
+
+        for person in self.population.get_persons():
+            ages.append(person.get_age())
+
+        mean_age = round(statistics.mean(ages), 2)
+        median_age = statistics.median(ages)
+        mode = statistics.mode(ages)
+
+        print("Mean Age: {} - Median Age: {} - Mode Age: {}".format(mean_age, median_age, mode))
+
+
     def show_histogram(self, data):
         plt.hist(data)
         plt.show()
+
+    def set_natality_stats(self, step, data):
+        print("Set Natality Stats")
+    
+    def set_mortality_stats(self, step, data):
+        print("Set Mortality Stats")

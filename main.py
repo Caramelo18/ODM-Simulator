@@ -13,6 +13,7 @@ NUM_SECTIONS = 29
 NUM_STEPS = 2
 
 def simulate(population):
+    population.get_stats().get_population_age_stats()
     for _ in range(NUM_STEPS):
         population.step()
 
@@ -36,10 +37,8 @@ def main():
     population.set_mortality(mortality_data)
     population.set_natality(natality_data)
 
-    stats = Stats(population)
     
     # stats.get_population_classes_stats()
-
     simulate(population)
     # stats.plot_population_by_age()
 

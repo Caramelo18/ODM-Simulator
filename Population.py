@@ -6,6 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import utils
 import random
+from Stats import Stats
 
 # Data from 2017 for "freguesia de Pombal" 
 DEATHS_PER_YEAR = 183
@@ -17,8 +18,11 @@ BIRTHS_PER_YEAR = 336
 BIRTHS_PER_YEAR_M = 166
 BIRTHS_PER_YEAR_F = 170
 
-# Data from 2017 for "Pombal" municipality
-MIGRATORY_BALANCE = -250
+# Data from 2011 to 2017 for "Pombal" municipality
+MIGRATORY_BALANCE = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015': 161, '2016': -217, '2017': -250}
+
+# Data from 2011 for "freguesia de Pombal" (Proporção da população residente que 1 ano antes residia noutra unidade territorial (%) por Local de residência)
+INCOMING_POP_PERC_PER_YEAR = 10.68
 
 REG_LEIRIA_POP = 294632
 MUN_POMB_POP = 55217
@@ -32,11 +36,16 @@ class Population:
         self.num_places = num_places
         self.step_num = 0
 
+        self.stats = Stats(self)
+
     def get_persons(self):
         return self.persons
     
     def get_population_size(self):
         return len(self.persons)
+
+    def get_stats(self):
+        return self.stats
 
     def set_mortality(self, data):
         self.mortality_probabilites = data
@@ -76,9 +85,12 @@ class Population:
 
         self.simulate_mortality()
         self.simulate_natality()
+        self.simulate_migrations()
 
         print(self)
         self.step_num += 1
+
+        self.stats.get_population_age_stats()
 
     def simulate_mortality(self):
         try:
@@ -138,6 +150,20 @@ class Population:
 
 
         print("Step {} - {} persons were born".format(self.step_num, len(mothers_age_ranges)))
+
+    def simulate_migrations(self):
+        num_income_people = int(INCOMING_POP_PERC_PER_YEAR * 0.01 * self.get_population_size())
+        num_outcome_people = num_income_people - MIGRATORY_BALANCE['2017']
+
+        rand_inc = int(np.random.normal(0, int(num_income_people * 0.05)))
+        rand_out = int(np.random.normal(0, int(num_outcome_people * 0.05)))
+
+        num_income_people += rand_inc
+        num_outcome_people += rand_out
+
+        migr_bal = num_income_people - num_outcome_people
+        # print(num_income_people, num_outcome_people, migr_bal)
+
 
     def get_random_person_by_age(self, age):
         possible_persons = []

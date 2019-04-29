@@ -11,13 +11,11 @@ class Person:
         self.age = age if age is not None else self.guess_age()
 
     def __str__(self):
-        return 'Oi'
-
-    def __repr__(self):
-        return 'Person from {} to {}'.format(self.origin, self.destination)
+        return 'Person with {} year(s) ({}) that lives in zone {}.'.format(self.age, self.person_class, self.origin)
 
     def evolve(self):
         self.step += 1
+        self.update_age_and_class()
     
     def get_origin(self):
         return self.origin
@@ -48,3 +46,19 @@ class Person:
         elif self.person_class == PersonClass.CLASS6:
             return randint(51, 64)
         return int(np.random.normal(80, 10))
+
+    def update_age_and_class(self):
+        self.age += 1
+        
+        if self.age == 6:
+            self.person_class = PersonClass.CLASS2
+        elif self.age == 10:
+            self.person_class = PersonClass.CLASS3
+        elif self.age == 19:
+            self.person_class = PersonClass.CLASS4
+        elif self.age == 36:
+            self.person_class = PersonClass.CLASS5
+        elif self.age == 51:
+            self.person_class = PersonClass.CLASS6
+        elif self.age == 65:
+            self.person_class = PersonClass.CLASS7

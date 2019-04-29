@@ -7,7 +7,7 @@ class PersonClass(Enum):
     CLASS4 = 4 # 19-35 years
     CLASS5 = 5 # 36-50 years
     CLASS6 = 6 # 51-64 years
-    CLASS7 = 7 # >65 years
+    CLASS7 = 7 # >=65 years
 
 class Schools(Enum):
     SCH_1 = 1 # 1st to 4th grade
