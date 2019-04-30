@@ -117,6 +117,8 @@ class Population:
                     death_ages[i] = age 
             self.remove_person(d_person)        
 
+        self.stats.add_mortality_stats(self.step_num, death_ages)
+
         print("Step {} - {} persons are now dead".format(self.step_num, len(death_ages)))
         # plt.hist(death_ages, bins="auto")
         # plt.xlabel("Age")
@@ -136,6 +138,7 @@ class Population:
         births += rand
         
         newborns_places = []
+        mothers_ages = []
 
         mothers_age_ranges = utils.generate_ages_by_probabilites(self.natality_probabilites, births)
 
@@ -145,9 +148,11 @@ class Population:
             mother_place = mother.get_origin()
             destination = 32
             newborns_places.append(mother_place)
+            mothers_ages.append(mother.get_age())
             person = Person(mother_place, destination, PersonClass.CLASS1, 0)
             self.add_person(person)
 
+        self.stats.add_natality_stats(self.step_num, {'places': newborns_places, 'ages': mothers_ages})
 
         print("Step {} - {} persons were born".format(self.step_num, len(mothers_age_ranges)))
 

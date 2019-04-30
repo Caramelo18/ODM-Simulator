@@ -1,10 +1,15 @@
 from matplotlib import pyplot as plt
+import numpy as np
 from Enums import PersonClass
 import statistics
+import collections
+
 
 class Stats:
     def __init__(self, population):
         self.population = population
+        self.natality_stats = {}
+        self.mortality_stats = {}
 
     def get_persons_by_class(self, person_class):
         persons = []
@@ -46,8 +51,35 @@ class Stats:
         plt.hist(data)
         plt.show()
 
-    def set_natality_stats(self, step, data):
-        print("Set Natality Stats")
+    def add_natality_stats(self, step, data):
+        self.natality_stats[step] = data
     
-    def set_mortality_stats(self, step, data):
-        print("Set Mortality Stats")
+    def add_mortality_stats(self, step, data):
+        self.mortality_stats[step] = data
+
+    def show_natality_chart(self):
+        steps = self.natality_stats.keys()
+        bar_width = 0.9 / len(steps)
+        
+        ages = np.arange(15, 50)
+
+        for step in steps:
+            ages_data = self.natality_stats[step]['ages']
+            counts = collections.Counter(ages_data)
+            frequencies = []
+            for age in ages:
+                if age in counts:
+                    frequencies.append(counts[age])
+                else:
+                    frequencies.append(0)
+                    
+            offset = step * bar_width
+            label_str = "Step {}".format(step)
+            plt.bar(ages + offset, frequencies, width=bar_width, label=label_str)
+
+        plt.xlabel("Ages")
+        plt.ylabel("Mothers Ages")
+        plt.xticks(ages + bar_width, ages)
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
