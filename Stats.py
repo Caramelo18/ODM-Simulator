@@ -83,3 +83,30 @@ class Stats:
         plt.legend()
         plt.tight_layout()
         plt.show()
+    
+    def show_mortality_chart(self):
+        steps = self.mortality_stats.keys()
+        bar_width = 0.9 / len(steps)
+        
+        ages = np.arange(0, 101)
+
+        for step in steps:
+            ages_data = self.mortality_stats[step]
+            counts = collections.Counter(ages_data)
+            frequencies = []
+            for age in ages:
+                if age in counts:
+                    frequencies.append(counts[age])
+                else:
+                    frequencies.append(0)
+
+            offset = step * bar_width
+            label_str = "Step {}".format(step)
+            plt.bar(ages + offset, frequencies, width=bar_width, label=label_str)
+        
+        plt.xlabel("Ages")
+        plt.ylabel("Number of Deaths")
+        plt.xticks(ages + bar_width, ages)
+        plt.legend()
+        plt.tight_layout()
+        plt.show()

@@ -17,7 +17,8 @@ def simulate(population):
     for _ in range(NUM_STEPS):
         population.step()
 
-    population.get_stats().show_natality_chart()
+    # population.get_stats().show_natality_chart()
+    # population.get_stats().show_mortality_chart()
 
 def main():
     # population = Population(NUM_SECTIONS)
