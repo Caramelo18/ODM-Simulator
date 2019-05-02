@@ -1,6 +1,6 @@
 ☐ Implement Migrations
 ✔ Fix Person str @done (4/29/2019, 11:46:41 AM)
-☐ Implement Natality and other progressions stats (like average age)
+✔ Implement Natality and other progressions stats (like average age) @done (5/2/2019, 11:02:46 AM)
 ✔ Redo probabilities for natality and mortality @done (4/27/2019, 10:37:34 PM)
 ✔ Implement population aging and class changes @done (4/29/2019, 12:29:43 PM)
 ☐ Implement natality and mortality progressions through years (?)

@@ -24,6 +24,11 @@ MIGRATORY_BALANCE = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015'
 # Data from 2011 for "freguesia de Pombal" (Proporção da população residente que 1 ano antes residia noutra unidade territorial (%) por Local de residência)
 INCOMING_POP_PERC_PER_YEAR = 10.68
 
+# Data from 21/03/2011 for "freguesia de Pombal" (relative to 31/12/2009)
+MIGR_NO_CHANGE = 15160
+MIGR_FROM_SAME = 1143
+MIGR_FROM_OUT = 692
+
 REG_LEIRIA_POP = 294632
 MUN_POMB_POP = 55217
 FREG_POMB_POP = 17187
@@ -157,17 +162,22 @@ class Population:
         print("Step {} - {} persons were born".format(self.step_num, len(mothers_age_ranges)))
 
     def simulate_migrations(self):
-        num_income_people = int(INCOMING_POP_PERC_PER_YEAR * 0.01 * self.get_population_size())
-        num_outcome_people = num_income_people - MIGRATORY_BALANCE['2017']
+        num_income_people = MIGR_FROM_OUT / FREG_POMB_POP * 0.75
+        num_income_people = int(num_income_people * self.get_population_size())
+        migr_balance = int(MIGRATORY_BALANCE['2017'] * FREG_POMB_POP / MUN_POMB_POP)
+        num_outcome_people = num_income_people - migr_balance
 
-        rand_inc = int(np.random.normal(0, int(num_income_people * 0.05)))
-        rand_out = int(np.random.normal(0, int(num_outcome_people * 0.05)))
+        rand_inc = int(np.random.normal(0, int(num_income_people * 0.02)))
+        rand_out = int(np.random.normal(0, int(num_outcome_people * 0.02)))
 
         num_income_people += rand_inc
         num_outcome_people += rand_out
 
         migr_bal = num_income_people - num_outcome_people
-        # print(num_income_people, num_outcome_people, migr_bal)
+
+        # TODO: age missing for migrations - how to to it?
+        
+        print("Step {} - {} new persons entered and {} left".format(self.step_num, num_income_people, num_outcome_people))
 
 
     def get_random_person_by_age(self, age):
