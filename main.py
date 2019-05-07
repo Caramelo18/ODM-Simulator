@@ -19,6 +19,7 @@ def simulate(population):
 
     # population.get_stats().show_natality_chart()
     # population.get_stats().show_mortality_chart()
+    population.get_dynamics()
 
 def main():
     # population = Population(NUM_SECTIONS)

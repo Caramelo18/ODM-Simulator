@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 import utils
 import random
 from Stats import Stats
+from Dynamics import Dynamics
 
 # Data from 2017 for "freguesia de Pombal" 
 DEATHS_PER_YEAR = 183
@@ -40,8 +41,11 @@ class Population:
         self.persons = []
         self.num_places = num_places
         self.step_num = 0
-
+        self.dynamics = Dynamics(self)
         self.stats = Stats(self)
+
+    def get_dynamics(self):
+        self.dynamics.get_persons_by_class_and_zone(PersonClass.CLASS3, 57)
 
     def get_persons(self):
         return self.persons

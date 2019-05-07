@@ -12,6 +12,9 @@ class Person:
 
     def __str__(self):
         return 'Person with {} year(s) ({}) that lives in zone {}.'.format(self.age, self.person_class, self.origin)
+    
+    def __repr__(self):
+        return 'A {} - C {} - O {}'.format(self.age, self.person_class, self.origin)
 
     def evolve(self):
         self.step += 1
