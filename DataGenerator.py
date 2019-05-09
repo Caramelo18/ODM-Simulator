@@ -7,6 +7,7 @@ from random import randint
 from Person import Person
 from Population import Population
 from Enums import PersonClass
+import Parser
 import random
 
 basepath = 'data/' 
@@ -97,6 +98,38 @@ def load_od_reg(filename):
 
 
     return population
+
+
+def init_population(filename):
+    filepath = basepath + filename
+    df = pandas.read_csv(filepath)
+
+    num_places = len(df)
+    df = df.drop(df.columns[0], axis = 1)
+    # print(df)
+
+    population = Population(num_places)
+    age_ranges = Parser.get_age_ranges()
+    population_ages = Parser.get_population_data()[2017]
+    
+    total_pop = sum(population_ages.values())
+    for pop in population_ages:
+        percentage = population_ages[pop]/total_pop
+        population_ages[pop] = percentage
+
+    for _, row in df.iterrows():
+        lug_pop = row['POPULATION']
+        home_loc = row['PLACE_ID']
+
+        for (a, b) in population_ages:
+            percentage = population_ages[(a, b)]
+            pop_in_range = int(percentage * lug_pop)
+            population.add_batch_age_range(pop_in_range, home_loc, a, b)
+    
+    print(population.get_population_size())
+    population.get_population_age_distribution()
+    return population
+
 
 def guess_age(person_class):
     return 1

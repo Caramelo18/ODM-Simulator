@@ -1,4 +1,3 @@
-from Person import Person
 from random import randint
 from Enums import PersonClass, Schools
 from PIL import Image
@@ -6,8 +5,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 import utils
 import random
+from Person import Person
 from Stats import Stats
 from Dynamics import Dynamics
+from Predictor import Predictor
+import Parser
 
 # Data from 2017 for "freguesia de Pombal" 
 DEATHS_PER_YEAR = 183
@@ -43,6 +45,8 @@ class Population:
         self.step_num = 0
         self.dynamics = Dynamics(self)
         self.stats = Stats(self)
+        self.predictor = Predictor()
+
 
     def get_dynamics(self):
         self.dynamics.get_persons_by_class_and_zone(PersonClass.CLASS3, 57)
@@ -74,10 +78,17 @@ class Population:
     def add_person(self, person):
         self.persons.append(person)
 
-    def add_batch(self, size, origin, destination, person_class = PersonClass.CLASS1):
+    def add_batch(self, size, origin, destination = None, person_class = PersonClass.CLASS1):
         for _ in range(size):
             p = Person(origin, destination, person_class)
             self.add_person(p)
+
+    def add_batch_age_range(self, size, origin, min_age, max_age):
+        for _ in range(size):
+            age = randint(min_age, max_age)
+            p = Person(origin, PersonClass.CLASS1, age = age)
+            self.add_person(p)
+
 
     def remove_person(self, person):
         self.persons.remove(person)
@@ -209,6 +220,28 @@ class Population:
             return None
 
         return possible_persons[0]
+    
+    def get_num_persons_in_age_range(self, min_age, max_age):
+        possible_persons = []
+        for person in self.persons:
+            if person.get_age() >= min_age and person.get_age() <= max_age:
+                possible_persons.append(person)
+        
+        return len(possible_persons)
+
+    def get_population_age_distribution(self):
+        age_ranges = Parser.get_age_ranges()
+        (min_a, max_a) = age_ranges[len(age_ranges) - 1]
+        max_a = 120
+        age_ranges[len(age_ranges) - 1] = (min_a, max_a)
+
+        info = []
+
+        for (min_a, max_a) in age_ranges:
+            num = self.get_num_persons_in_age_range(min_a, max_a)
+            info.append(num)
+        
+        print(info)
         
     
     def get_odm(self):
