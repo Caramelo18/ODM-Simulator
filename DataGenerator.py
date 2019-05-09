@@ -120,14 +120,12 @@ def init_population(filename):
     for _, row in df.iterrows():
         lug_pop = row['POPULATION']
         home_loc = row['PLACE_ID']
-
+        
         for (a, b) in population_ages:
             percentage = population_ages[(a, b)]
-            pop_in_range = int(percentage * lug_pop)
+            pop_in_range = int(round(percentage * lug_pop, 0))
             population.add_batch_age_range(pop_in_range, home_loc, a, b)
-    
-    print(population.get_population_size())
-    population.get_population_age_distribution()
+                
     return population
 
 

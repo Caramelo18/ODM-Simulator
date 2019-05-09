@@ -38,16 +38,18 @@ def main():
     natality_data = Parser.get_natality_data()
     
     # population = DataGenerator.load_od_reg("fake-data.csv")
-    # population.set_mortality(mortality_data)
-    # population.set_natality(natality_data)
+    population = DataGenerator.init_population("fake-data.csv")
+    population.set_mortality(mortality_data)
+    population.set_natality(natality_data)
+    population.train_predictiors()
 
     # population.get_population_age_distribution()
 
-    population = DataGenerator.init_population("fake-data.csv")
+    
 
     
     # stats.get_population_classes_stats()
-    # simulate(population)
+    simulate(population)
     # stats.plot_population_by_age()
 
   

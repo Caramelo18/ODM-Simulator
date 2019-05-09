@@ -1,6 +1,7 @@
 from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 from sklearn import linear_model
 from sklearn.metrics import r2_score
+from sklearn import preprocessing
 import Parser
 import numpy as np
 
@@ -20,16 +21,24 @@ class Predictor:
         mortality_data = list(mortality_data.values())
         population_data = list(population_data.values())
 
+        for i in range(len(mortality_data)):
+            perc = mortality_data[i] / sum(population_data[i].values())
+            mortality_data[i] = perc * 1000000
+
         pop_data = []
         for val in population_data:
             rng = list(val.values())
+            # rng = [x / sum(rng) for x in rng]
             pop_data.append(rng)
+
             
         mortality_data = np.array(mortality_data)
-        population_data = np.array(pop_data)
-        # print(pop_data)
+        population_data = np.array(pop_data).astype(float)
 
-        k_fold = KFold(n_splits=4)
+        population_data = preprocessing.scale(population_data)
+        
+
+        k_fold = KFold(n_splits=7)
 
         for train_index, test_index in k_fold.split(population_data):
         #     print("train indices:", train_index)
@@ -38,20 +47,27 @@ class Predictor:
         #     print("test data:", population_data[test_index])
             self.mortality_predictor.fit(population_data[train_index], mortality_data[train_index])
 
-        # pred = cross_val_predict(lasso, population_data, mortality_data, cv=7)
-        # accuracy = accuracy_score(pred.astype(int), mortality_data.astype(int))
-        # print(accuracy)
+        # pred = cross_val_predict(self.mortality_predictor, population_data, mortality_data, cv=7)
+        # print("pred", pred)
+        # return
+        
+        # predictions = []
 
-        predictions = []
-
-        for i in range(len(population_data)):
-            data = population_data[i]
-            pred = int(self.mortality_predictor.predict([data]))
-            predictions.append(pred)
-            print(pred, mortality_data[i])
-
-        score = r2_score(mortality_data, predictions)
-        print(score)
+        # for i in range(len(population_data)):
+        #     data = population_data[i]
+        #     pred = self.mortality_predictor.predict([data])
+        #     predictions.append(pred)
+        #     print(pred, mortality_data[i])
+        # print(predictions)
+        # score = r2_score(mortality_data, predictions)
+        # print(score)
+    
+    def predict_mortality(self, age_distribution):
+        data = preprocessing.scale(age_distribution)
+        total = sum(age_distribution)
+        pred = self.mortality_predictor.predict([data])[0] / 1000000
+        pred = pred * total
+        print("Predicted Mortality: ", pred)
 
 
 

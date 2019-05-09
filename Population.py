@@ -74,6 +74,9 @@ class Population:
             probabilities.append(prob)
 
         self.natality_probabilites = probabilities
+    
+    def train_predictiors(self):
+        self.predictor.init_mortality_predictor()
 
     def add_person(self, person):
         self.persons.append(person)
@@ -111,6 +114,9 @@ class Population:
         self.step_num += 1
 
         self.stats.get_population_age_stats()
+        
+        age_dist = self.get_population_age_distribution()
+        self.predictor.predict_mortality(age_dist)
 
     def simulate_mortality(self):
         try:
@@ -242,6 +248,7 @@ class Population:
             info.append(num)
         
         print(info)
+        return info
         
     
     def get_odm(self):
