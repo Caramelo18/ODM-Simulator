@@ -131,7 +131,7 @@ def get_natality_data_2011_2018():
         row = table[i].find_all("td")[2].text
         data[year - i] = int(row)
 
-    print(data)
+    return data
 
 def get_mortality_data_2011_2018():
     soup = BeautifulSoup(open("data/mortalidade_2011_2018.html"), 'html.parser')

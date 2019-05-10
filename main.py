@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 POPULATION_SIZE = 100
 NUM_SECTIONS = 29
-NUM_STEPS = 3
+NUM_STEPS = 1
 
 def simulate(population):
     population.get_stats().get_population_age_stats()
@@ -19,7 +19,6 @@ def simulate(population):
 
     # population.get_stats().show_natality_chart()
     # population.get_stats().show_mortality_chart()
-    population.get_dynamics()
 
 def main():
     # population = Population(NUM_SECTIONS)

@@ -77,6 +77,7 @@ class Population:
     
     def train_predictiors(self):
         self.predictor.init_mortality_predictor()
+        self.predictor.init_natality_predictor()
 
     def add_person(self, person):
         self.persons.append(person)
@@ -105,7 +106,7 @@ class Population:
     def step(self):
         for person in self.persons:
             person.evolve()
-
+            
         self.simulate_mortality()
         self.simulate_natality()
         self.simulate_migrations()
@@ -115,8 +116,6 @@ class Population:
 
         self.stats.get_population_age_stats()
         
-        age_dist = self.get_population_age_distribution()
-        self.predictor.predict_mortality(age_dist)
 
     def simulate_mortality(self):
         try:
