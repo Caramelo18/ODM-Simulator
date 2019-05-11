@@ -31,6 +31,7 @@ class Distribution(object):
         self.params = {}
         for dist_name in self.dist_names:
             dist = getattr(scipy.stats, dist_name)
+            print(dist)
             param = dist.fit(y)
             
             self.params[dist_name] = param
@@ -47,6 +48,9 @@ class Distribution(object):
         self.isFitted = True
         self.min_val = min(y)
         self.max_val = max(y)
+
+        print(self.min_val)
+        print(self.max_val)
         return self.DistributionName,self.PValue
     
     def Random(self, n = 1, integer = True):
@@ -58,9 +62,29 @@ class Distribution(object):
             num = dist.rvs(*param[:-2], loc=param[-2], scale=param[-1], size=n)
             if integer:
                 num = num.astype(int)
-            return num
+            return self.Filter(num)
         else:
             raise ValueError('Must first run the Fit method.')
+    
+    def Filter(self, values):
+        init_len = len(values)
+        min_val = min(values)
+        max_val = max(values)
+        print(min_val, max_val, len(values))
+        filtered_values = values
+        while min_val < self.min_val or max_val > self.max_val:
+            for i in range(len(filtered_values)):
+                if filtered_values[i] > self.max_val:
+                    filtered_values[i] = self.Random()[0]
+                if filtered_values[i] < self.min_val:
+                    filtered_values[i] = self.Random()[0]
+
+            min_val = min(filtered_values)
+            max_val = max(filtered_values)
+            
+
+        print(min_val, max_val, len(filtered_values))
+        return filtered_values
             
     def Plot(self,y):
         x = self.Random(n=len(y))
