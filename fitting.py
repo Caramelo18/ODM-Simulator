@@ -7,12 +7,15 @@ import matplotlib.pyplot as plt
 import Parser
 from collections import Counter
 
+import warnings
+
 
 # Source: http://www.insightsbot.com/blog/WEjdW/fitting-probability-distributions-with-python-part-1
 class Distribution(object):
     
     def __init__(self,dist_names_list = []):
-        self.dist_names = ['norm','lognorm','expon']
+        self.dist_names = [d for d in dir(scipy.stats) if isinstance(getattr(scipy.stats, d), scipy.stats.rv_continuous)] # ['norm','lognorm','expon']
+        self.dist_names.remove("levy_stable")
         self.dist_results = []
         self.params = {}
         
@@ -27,11 +30,13 @@ class Distribution(object):
         
         
     def Fit(self, y):
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+
         self.dist_results = []
         self.params = {}
         for dist_name in self.dist_names:
             dist = getattr(scipy.stats, dist_name)
-            print(dist)
             param = dist.fit(y)
             
             self.params[dist_name] = param
@@ -44,13 +49,14 @@ class Distribution(object):
         #store the name of the best fit and its p value
         self.DistributionName = sel_dist
         self.PValue = p
-        
+        # print("BEST: ", self.DistributionName)
         self.isFitted = True
         self.min_val = min(y)
         self.max_val = max(y)
 
-        print(self.min_val)
-        print(self.max_val)
+        warnings.filterwarnings("always", category=RuntimeWarning)
+        warnings.filterwarnings("always", category=DeprecationWarning)
+
         return self.DistributionName,self.PValue
     
     def Random(self, n = 1, integer = True):
@@ -61,6 +67,9 @@ class Distribution(object):
             dist = getattr(scipy.stats, dist_name)
             num = dist.rvs(*param[:-2], loc=param[-2], scale=param[-1], size=n)
             if integer:
+                #TODO: FIX THIS TO ROUND
+                for i in range(len(num)):
+                    num[i] = round(num[i], 0)
                 num = num.astype(int)
             return self.Filter(num)
         else:
@@ -70,7 +79,6 @@ class Distribution(object):
         init_len = len(values)
         min_val = min(values)
         max_val = max(values)
-        print(min_val, max_val, len(values))
         filtered_values = values
         while min_val < self.min_val or max_val > self.max_val:
             for i in range(len(filtered_values)):
@@ -82,8 +90,6 @@ class Distribution(object):
             min_val = min(filtered_values)
             max_val = max(filtered_values)
             
-
-        print(min_val, max_val, len(filtered_values))
         return filtered_values
             
     def Plot(self,y):
@@ -107,9 +113,10 @@ for i in range(len(data)):
         r.append(i + 1)
 
 dist.Fit(r)
-dist.Plot(r)
 
 true = Counter(r)
 fit = Counter(dist.Random(len(r)))
 print(true)
 print(fit)
+
+dist.Plot(r)
