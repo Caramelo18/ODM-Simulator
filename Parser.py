@@ -27,6 +27,8 @@ def get_mortality_data():
 
     probabilites = []
     
+    return data
+    
     for age in data:
         probabilites.append(data[age]/total)
 

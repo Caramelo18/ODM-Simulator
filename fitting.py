@@ -13,9 +13,12 @@ import warnings
 # Source: http://www.insightsbot.com/blog/WEjdW/fitting-probability-distributions-with-python-part-1
 class Distribution(object):
     
-    def __init__(self,dist_names_list = []):
-        self.dist_names = [d for d in dir(scipy.stats) if isinstance(getattr(scipy.stats, d), scipy.stats.rv_continuous)] # ['norm','lognorm','expon']
-        self.dist_names.remove("levy_stable")
+    def __init__(self,dist_names_list = [], custom_dist = True):
+        if custom_dist:
+            self.dist_names = ["genlogistic", "johnsonsu"]
+        else:
+            self.dist_names = [d for d in dir(scipy.stats) if isinstance(getattr(scipy.stats, d), scipy.stats.rv_continuous)] # ['norm','lognorm','expon']
+            
         self.dist_results = []
         self.params = {}
         
@@ -112,11 +115,21 @@ for i in range(len(data)):
         rng = i + 1
         r.append(i + 1)
 
-dist.Fit(r)
+# dist.Fit(r)
 
-true = Counter(r)
-fit = Counter(dist.Random(len(r)))
-print(true)
-print(fit)
+# true = Counter(r)
+# fit = Counter(dist.Random(len(r)))
+# print(true)
+# print(fit)
 
-dist.Plot(r)
+# dist.Plot(r)
+
+mortality_data = list(Parser.get_mortality_data().values())
+r1 = []
+for i in range(len(mortality_data)):
+    deaths = mortality_data[i]
+    for _ in range(deaths):
+        r1.append(i)
+        
+dist.Fit(r1)
+dist.Plot(r1)

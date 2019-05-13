@@ -104,8 +104,7 @@ class Population:
         return ret
 
     def step(self):
-        for person in self.persons:
-            person.evolve()
+        self.step_people()
             
         self.simulate_mortality()
         self.simulate_natality()
@@ -115,8 +114,11 @@ class Population:
         self.step_num += 1
 
         self.stats.get_population_age_stats()
-        
 
+    def step_people(self):
+        for person in self.persons:
+            person.evolve()
+        
     def simulate_mortality(self):
         try:
             self.mortality_probabilites
@@ -246,7 +248,6 @@ class Population:
             num = self.get_num_persons_in_age_range(min_a, max_a)
             info.append(num)
         
-        print(info)
         return info
         
     

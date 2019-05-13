@@ -100,7 +100,7 @@ def load_od_reg(filename):
     return population
 
 
-def init_population(filename):
+def init_population(filename, year = 2017):
     filepath = basepath + filename
     df = pandas.read_csv(filepath)
 
@@ -110,7 +110,7 @@ def init_population(filename):
 
     population = Population(num_places)
     age_ranges = Parser.get_age_ranges()
-    population_ages = Parser.get_population_data()[2017]
+    population_ages = Parser.get_population_data()[year]
     
     total_pop = sum(population_ages.values())
     for pop in population_ages:
