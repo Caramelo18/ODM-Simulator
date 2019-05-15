@@ -115,14 +115,14 @@ for i in range(len(data)):
         rng = i + 1
         r.append(i + 1)
 
-# dist.Fit(r)
+dist.Fit(r)
 
-# true = Counter(r)
-# fit = Counter(dist.Random(len(r)))
-# print(true)
-# print(fit)
+true = Counter(r)
+fit = Counter(dist.Random(len(r)))
+print(true)
+print(fit)
 
-# dist.Plot(r)
+dist.Plot(r)
 
 mortality_data = list(Parser.get_mortality_data().values())
 r1 = []

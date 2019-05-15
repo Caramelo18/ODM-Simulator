@@ -1,4 +1,4 @@
-from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
+from sklearn.model_selection import KFold, cross_val_score, cross_val_predict, cross_validate
 from sklearn import linear_model
 from sklearn.metrics import r2_score
 from sklearn import preprocessing
@@ -7,8 +7,12 @@ import numpy as np
 
 class Predictor:
     def __init__(self):
-        self.mortality_predictor = linear_model.Lasso(max_iter=20000)
+        self.mortality_predictor = linear_model.ARDRegression()
+        #Lasso - 0.76
+        #ADR   - 0.85
         self.natality_predictor = linear_model.BayesianRidge(n_iter=20000)
+
+        self.mortality_offset = 1000000
         #BBayesianRidge - 0.2
 
     
@@ -25,7 +29,7 @@ class Predictor:
 
         for i in range(len(mortality_data)):
             perc = mortality_data[i] / sum(population_data[i].values())
-            mortality_data[i] = perc * 1000000
+            mortality_data[i] = perc * self.mortality_offset
 
         pop_data = []
         for val in population_data:
@@ -39,29 +43,16 @@ class Predictor:
 
         population_data = preprocessing.scale(population_data)
 
-        k_fold = KFold(n_splits=4)
+        k_fold = KFold(n_splits=7)
 
-        for train_index, test_index in k_fold.split(population_data):
+        for train_index, test_index in k_fold.split(mortality_data):
         #     print("train indices:", train_index)
         #     print("train data:", population_data[train_index])
         #     print("test indices:", test_index)
         #     print("test data:", population_data[test_index])
-            self.mortality_predictor.fit(population_data[train_index], mortality_data[train_index])
-
-        # pred = cross_val_predict(self.mortality_predictor, population_data, mortality_data, cv=7)
-        # print("pred", pred)
-        # return
+            self.mortality_predictor.fit(population_data[train_index], mortality_data[train_index])   
         
-        # predictions = []
-
-        # for i in range(len(population_data)):
-        #     data = population_data[i]
-        #     pred = self.mortality_predictor.predict([data])
-        #     predictions.append(pred)
-        #     print(pred, mortality_data[i])
-        # print(predictions)
-        # score = r2_score(mortality_data, predictions)
-        # print(score)
+        self.evaluate_mortality(population_data, mortality_data)
 
     def init_natality_predictor(self):
         natality_data = Parser.get_natality_data_2011_2018()
@@ -89,31 +80,38 @@ class Predictor:
 
         population_data = preprocessing.scale(population_data)
 
-        
-
         k_fold = KFold(n_splits=7)
 
-        for train_index, test_index in k_fold.split(population_data):
-        #     print("train indices:", train_index)
-        #     print("train data:", population_data[train_index])
-        #     print("test indices:", test_index)
-        #     print("test data:", population_data[test_index])
+        for train_index, test_index in k_fold.split(natality_data):
+            # print("train indices:", train_index)
+            # print("train data:", population_data[train_index])
+            # print("test indices:", test_index)
+            # print("test data:", population_data[test_index])
             self.natality_predictor.fit(population_data[train_index], natality_data[train_index])
 
-        pred = cross_val_predict(self.natality_predictor, population_data, natality_data, cv=7)
-        score = r2_score(natality_data, pred)
-        print(pred)
-        print(natality_data)
-        print(score)
+        
+        self.evaluate_natality(population_data, natality_data)
+
     
     def predict_mortality(self, age_distribution):
         data = preprocessing.scale(age_distribution)
         total = sum(age_distribution)
-        pred = self.mortality_predictor.predict([data])[0] / 1000000
+        pred = self.mortality_predictor.predict([data])[0] / self.mortality_offset
         pred = int(pred * total)
         print("Predicted Mortality: ", pred)
 
+    def evaluate_mortality(self, population_data, mortality_data):
+        pred = cross_val_predict(self.mortality_predictor, population_data, mortality_data, cv=7)
+        score = r2_score(mortality_data, pred)
 
+        print("Mortality R2 Score:", score)
+        
+    def evaluate_natality(self, population_data, natality_data):
+        pred = cross_val_predict(self.natality_predictor, population_data, natality_data, cv=7)
+        score = r2_score(natality_data, pred)
+        
+        print("Natality R2 Score:", score)
 
-# p = Predictor()
-# p.init_mortality_predictor()
+p = Predictor()
+p.init_mortality_predictor()
+p.init_natality_predictor()

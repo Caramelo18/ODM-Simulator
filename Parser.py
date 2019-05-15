@@ -27,6 +27,7 @@ def get_mortality_data():
 
     probabilites = []
     
+    # TODO: change this return /adapt depending on predictor or current
     return data
     
     for age in data:

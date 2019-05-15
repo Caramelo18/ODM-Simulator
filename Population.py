@@ -125,7 +125,7 @@ class Population:
         except AttributeError:
             print("ERROR: No mortality data loaded")
             exit(1)
-
+            
         death_percentage = DEATHS_PER_YEAR / FREG_POMB_POP
         num_deaths = int(self.get_population_size() * death_percentage)
 
