@@ -34,19 +34,21 @@ def main():
     
     # Loader.load_shapefile('pombal.shp')
 
-    mortality_data = Parser.get_mortality_data()
-    natality_data = Parser.get_natality_data()
     
     # population = DataGenerator.load_od_reg("fake-data.csv")
-    population = DataGenerator.init_population("fake-data.csv")
+
+    # population = DataGenerator.init_population("fake-data.csv")
+    # print(population.get_population_age_distribution())
+
+
+    mortality_data = Parser.get_mortality_data()
+    natality_data = Parser.get_natality_data()
+    population = DataGenerator.init_population_census_2011()
     population.set_mortality(mortality_data)
     population.set_natality(natality_data)
     population.train_predictiors()
 
     # population.get_population_age_distribution()
-
-    
-
     
     # stats.get_population_classes_stats()
     simulate(population)
