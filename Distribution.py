@@ -70,7 +70,6 @@ class Distribution(object):
             dist = getattr(scipy.stats, dist_name)
             num = dist.rvs(*param[:-2], loc=param[-2], scale=param[-1], size=n)
             if integer:
-                #TODO: FIX THIS TO ROUND
                 for i in range(len(num)):
                     num[i] = round(num[i], 0)
                 num = num.astype(int)
@@ -102,34 +101,34 @@ class Distribution(object):
         plt.legend(loc='upper right')
         plt.show()
 
-dist = Distribution()
+# dist = Distribution()
 
-data = Parser.get_natality_data()
-data.pop('total_births', None)
-print(data)
-r = []
-for i in range(len(data)):
-    key = list(data.keys())[i]
-    num = int(data[key])
-    for _ in range(num):
-        rng = i + 1
-        r.append(i + 1)
+# data = Parser.get_natality_data()
+# data.pop('total_births', None)
+# print(data)
+# r = []
+# for i in range(len(data)):
+#     key = list(data.keys())[i]
+#     num = int(data[key])
+#     for _ in range(num):
+#         rng = i + 1
+#         r.append(i + 1)
 
-dist.Fit(r)
+# dist.Fit(r)
 
-true = Counter(r)
-fit = Counter(dist.Random(len(r)))
-print(true)
-print(fit)
+# true = Counter(r)
+# fit = Counter(dist.Random(len(r)))
+# print(true)
+# print(fit)
 
-dist.Plot(r)
+# dist.Plot(r)
 
-mortality_data = list(Parser.get_mortality_data().values())
-r1 = []
-for i in range(len(mortality_data)):
-    deaths = mortality_data[i]
-    for _ in range(deaths):
-        r1.append(i)
+# mortality_data = list(Parser.get_mortality_data().values())
+# r1 = []
+# for i in range(len(mortality_data)):
+#     deaths = mortality_data[i]
+#     for _ in range(deaths):
+#         r1.append(i)
         
-dist.Fit(r1)
-dist.Plot(r1)
+# dist.Fit(r1)
+# dist.Plot(r1)

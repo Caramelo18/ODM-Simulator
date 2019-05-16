@@ -9,6 +9,7 @@ from Person import Person
 from Stats import Stats
 from Dynamics import Dynamics
 from Predictor import Predictor
+from Distribution import Distribution
 import Parser
 
 # Data from 2017 for "freguesia de Pombal" 
@@ -61,21 +62,40 @@ class Population:
         return self.stats
 
     def set_mortality(self, data):
-        self.mortality_probabilites = data
+        print("Fitting mortality distribution")
+        mortality_data = list(data.values())
+        r = []
+        for i in range(len(mortality_data)):
+            deaths = mortality_data[i]
+            for _ in range(deaths):
+                r.append(i)
+                
+        dist = Distribution()
+        dist.Fit(r)
 
-    def set_natality(self, data):
-        keys = list(data)
-        total_births = int(data[keys[0]])
-        probabilities = []
+        self.mortality_distribution = dist
         
-        for i in range(1, len(keys)):
-            num_births = int(data[keys[i]])
-            prob = num_births/total_births
-            probabilities.append(prob)
+        
+    def set_natality(self, data):
+        print("Fitting natality distribution")
+        data.pop('total_births', None)
+        
+        r = []
+        for i in range(len(data)):
+            key = list(data.keys())[i]
+            num = int(data[key])
+            for _ in range(num):
+                rng = i + 1
+                r.append(i + 1)
 
-        self.natality_probabilites = probabilities
+        dist = Distribution()
+        dist.Fit(r)
+        
+        self.natality_distribution = dist
+    
     
     def train_predictiors(self):
+        print("Initializing predictors")
         self.predictor.init_mortality_predictor()
         self.predictor.init_natality_predictor()
 
@@ -121,24 +141,26 @@ class Population:
         
     def simulate_mortality(self):
         try:
-            self.mortality_probabilites
+            self.mortality_distribution
         except AttributeError:
             print("ERROR: No mortality data loaded")
             exit(1)
             
-        death_percentage = DEATHS_PER_YEAR / FREG_POMB_POP
-        num_deaths = int(self.get_population_size() * death_percentage)
+        # death_percentage = DEATHS_PER_YEAR / FREG_POMB_POP
+        # num_deaths = int(self.get_population_size() * death_percentage)
 
-        rand = int(np.random.normal(0, int(num_deaths * 0.05)))
-        num_deaths += rand
+        # rand = int(np.random.normal(0, int(num_deaths * 0.05)))
+        # num_deaths += rand
+        age_distibution = self.get_population_age_distribution()
+        num_deaths = self.predictor.predict_mortality(age_distibution)
 
-        death_ages = utils.generate_ages_by_probabilites(self.mortality_probabilites, num_deaths)
+        death_ages = self.mortality_distribution.Random(n=num_deaths)
         
         for i in range(len(death_ages)):
             age = death_ages[i]
             d_person = self.get_random_person_by_age(age)
             while d_person is None:
-                age = utils.generate_ages_by_probabilites(self.mortality_probabilites)[0]
+                age = self.mortality_distribution.Random()[0]
                 d_person = self.get_random_person_by_age(age)
                 if d_person is not None:
                     death_ages[i] = age 
@@ -154,7 +176,7 @@ class Population:
 
     def simulate_natality(self):
         try:
-            self.natality_probabilites
+            self.natality_distribution
         except AttributeError:
             print("ERROR: No natality data loaded")
             exit(1)
@@ -167,7 +189,7 @@ class Population:
         newborns_places = []
         mothers_ages = []
 
-        mothers_age_ranges = utils.generate_ages_by_probabilites(self.natality_probabilites, births)
+        mothers_age_ranges = self.natality_distribution.Random(n = births)
 
         for age_range in mothers_age_ranges:
             (min_age, max_age) = BIRTH_RANGES[age_range]

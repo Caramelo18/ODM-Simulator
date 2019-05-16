@@ -42,9 +42,8 @@ class Stats:
 
         mean_age = round(statistics.mean(ages), 2)
         median_age = statistics.median(ages)
-        mode = statistics.mode(ages)
 
-        print("Mean Age: {} - Median Age: {} - Mode Age: {}".format(mean_age, median_age, mode))
+        print("Mean Age: {} - Median Age: {}".format(mean_age, median_age))
 
 
     def show_histogram(self, data):

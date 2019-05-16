@@ -15,6 +15,7 @@ NUM_STEPS = 3
 def simulate(population):
     population.get_stats().get_population_age_stats()
     for _ in range(NUM_STEPS):
+        print(population.get_population_age_distribution())
         population.step()
 
     # population.get_stats().show_natality_chart()

@@ -10,11 +10,9 @@ class Predictor:
         self.mortality_predictor = linear_model.ARDRegression()
         #Lasso - 0.76
         #ADR   - 0.85
-        self.natality_predictor = linear_model.BayesianRidge(n_iter=20000)
+        self.natality_predictor = linear_model.BayesianRidge()
 
         self.mortality_offset = 1000000
-        #BBayesianRidge - 0.2
-
     
     def init_mortality_predictor(self):
         mortality_data = Parser.get_mortality_data_2011_2018()
@@ -75,6 +73,7 @@ class Predictor:
             # rng = [x / sum(rng) for x in rng]
             pop_data.append(rng)
 
+
         natality_data = np.array(natality_data)
         population_data = np.array(pop_data).astype(float)
 
@@ -98,7 +97,8 @@ class Predictor:
         total = sum(age_distribution)
         pred = self.mortality_predictor.predict([data])[0] / self.mortality_offset
         pred = int(pred * total)
-        print("Predicted Mortality: ", pred)
+        # print("Predicted Mortality: ", pred)
+        return pred
 
     def evaluate_mortality(self, population_data, mortality_data):
         pred = cross_val_predict(self.mortality_predictor, population_data, mortality_data, cv=7)
@@ -112,6 +112,6 @@ class Predictor:
         
         print("Natality R2 Score:", score)
 
-p = Predictor()
-p.init_mortality_predictor()
-p.init_natality_predictor()
+# p = Predictor()
+# p.init_mortality_predictor()
+# p.init_natality_predictor()

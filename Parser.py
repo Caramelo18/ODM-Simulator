@@ -8,7 +8,7 @@ import scipy.stats as stats
 import random
 
 
-def get_mortality_data():
+def get_mortality_data(probabilites = False):
     soup = BeautifulSoup(open("data/emvida.html"), 'html.parser')
 
     table = soup.find_all(class_="dados")[0]
@@ -27,8 +27,8 @@ def get_mortality_data():
 
     probabilites = []
     
-    # TODO: change this return /adapt depending on predictor or current
-    return data
+    if not probabilites:
+        return data
     
     for age in data:
         probabilites.append(data[age]/total)
