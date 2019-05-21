@@ -8,6 +8,7 @@ from Person import Person
 from Population import Population
 from Enums import PersonClass
 import Parser
+import Loader
 import random
 
 basepath = 'data/' 
@@ -207,4 +208,7 @@ def get_senior_age_distribution(total_senior):
         ret[key] = num_people
     
     return ret
+
+
+
 

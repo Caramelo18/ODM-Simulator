@@ -34,7 +34,7 @@ def load_population_data(filename):
 
     return sections
 
-def load_shapefile(filename):
+def load_shapefile(filename, lat, lon):
     filepath = basepath + filename
     shape_file = shapefile.Reader(filepath)
 
@@ -45,13 +45,16 @@ def load_shapefile(filename):
     point = (-8.64149, 39.88365) # Casalinho
     point = (-8.63600, 39.90731) # Pombal
     point = (-8.571673, 39.897888) # Vale
+    point = (lon, lat)
     point = Point(point)
 
+    zone = None
     for i, sh in enumerate(all_shapes):
         polygon = shape(sh)
         if polygon.contains(point):
-            print(all_records[i][8])
+            zone = all_records[i][8]
+            # print(zone)
 
-    
-    
+    return zone
+
     
