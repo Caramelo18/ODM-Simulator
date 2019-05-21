@@ -132,6 +132,14 @@ def init_population(filename, year = 2017):
 AGE_RANGES = ['[0-4] ', '[5-9] ', '[10-13] ', '[14-19] ', '[20-24] ', '[25-64] ', '[>64] '] 
 AGE_RANGES_NUM = [(0,4), (5,9), (10,13), (14,19), (20,24), (25,64), (65,100)]
 
+def get_resize_ratio():
+    MUN_2011_POP = 55018
+    MUN_2017_POP = 52324
+    # FREG_2011_POP = total['Total'][47]
+    ratio = MUN_2017_POP / MUN_2011_POP
+
+    return ratio
+
 def init_population_census_2011():
     filepath = basepath + "pombal-detailed.csv"
     df = pandas.read_csv(filepath)
@@ -141,10 +149,7 @@ def init_population_census_2011():
     df = df.drop(df.index[47])
     num_places = len(df)
 
-    MUN_2011_POP = 55018
-    MUN_2017_POP = 52324
-    FREG_2011_POP = total['Total'][47]
-    ratio = MUN_2017_POP / MUN_2011_POP
+    ratio = get_resize_ratio()
     
     for index, row in df.iterrows():
         new_num_pop = 0
