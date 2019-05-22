@@ -1,8 +1,9 @@
 import shapefile
 import shapely
+import random
 import numpy as np
 from shapely.geometry import Point, shape
-from pandas import pandas
+from pandas import pandas, ExcelWriter
 
 import DataGenerator
 
@@ -11,12 +12,15 @@ basepath = 'data/'
 class SurveyGenerator:
     def __init__(self):
         self.init_shapefile()
-        self.schools = []
-        self.workplaces = []
+        self.schools = {'ESC1': [], 'ESC2': [], 'ESC3': [], 'ESCSEC': []}
+        self.workplaces = {'Primary': [], 'Secondary': [], 'Tertiary': []}
         self.read_schools()
         self.read_workplaces()
         self.get_population_distribution()
         self.calculate_surveys_to_generate()
+        self.read_survey_template()
+        self.fill_students_surveys()
+        self.fill_workers_surveys()
 
     def init_shapefile(self):
         filepath = 'data/pombal.shp'
@@ -51,8 +55,9 @@ class SurveyGenerator:
             zone = self.get_point_zone(lat, lon)
             if zone is not None:
                 obj = {'name': name, 'zone': zone, 'type': school_type}
-                self.schools.append(obj)
+                self.schools[school_type].append(obj)
 
+        # print(self.schools)
         # print(self.schools, len(self.schools))
 
     def read_workplaces(self):
@@ -64,12 +69,13 @@ class SurveyGenerator:
             lon = row['Lon']
             name = row['Name']
             work_type = row['Work Type']
+            size = row['Size']
             zone = self.get_point_zone(lat, lon)
             if zone is not None:
-                obj = {'name': name, 'zone': zone, 'type': work_type}
-                self.workplaces.append(obj)
+                obj = {'name': name, 'zone': zone, 'type': work_type, 'size': size}
+                self.workplaces[work_type].append(obj)
 
-        # print(self.workplaces, len(self.workplaces))
+        # print(self.workplaces)
 
     def get_population_distribution(self):
         filepath = basepath + "pombal-detailed.csv"
@@ -101,14 +107,117 @@ class SurveyGenerator:
         for _, row in self.population_distibution.iterrows():
             obj = {'from': row['Localidade']}
             for occupation in occupations:
-                rand_perc = np.random.normal(20, 5) / 100
+                rand_perc = np.random.normal(20, 8) / 100
                 num = int(round(row[occupation] * rand_perc, 0))
                 obj[occupation] = num
 
-
             surveys_to_generate.append(obj)
+        self.surveys_to_generate = surveys_to_generate
+        # print(surveys_to_generate)
 
-        print(surveys_to_generate)
+    def read_survey_template(self):
+        filepath = basepath + "registo-od-clean.xlsx"
+        df = pandas.read_excel(filepath)
 
+        self.columns = df.columns.tolist()
+
+    def fill_students_surveys(self):
+        filepath = basepath + "registo-od-generated-students.xlsx"
+
+        row_list = []
+
+        for place in self.surveys_to_generate:
+            origin = place['from']
+            number = place['Estudantes']
+            
+            schools = self.generate_zone_schools()
+            
+            for _ in range(number):
+                d = dict.fromkeys(self.columns, '')
+                d['ORG-LUG'] = origin
+                school = schools[random.randint(0, len(schools) - 1)]
+                d['DEST-LUG'] = school['zone']
+                row_list.append(d)
+
+        random.shuffle(row_list)
+
+        df = pandas.DataFrame(row_list, columns=self.columns)
+
+        with ExcelWriter(filepath) as writer:
+            df.to_excel(writer)
+
+    def fill_workers_surveys(self):
+        filepath = basepath + "registo-od-generated-workers.xlsx"
+
+        row_list = []
+
+        for place in self.surveys_to_generate:
+            origin = place['from']
+            prim_number = place['Setor primário']
+            sec_number = place['Secundário']
+            tert_number = place['Terciário']
+            workplaces = self.generate_zone_workplaces(prim_number, sec_number, tert_number)
+            for workplace in workplaces:
+                d = dict.fromkeys(self.columns, '')
+                d['ORG-LUG'] = origin
+                d['DEST-LUG'] = workplace['zone']
+                row_list.append(d)
+
+        random.shuffle(row_list)
+
+        df = pandas.DataFrame(row_list, columns=self.columns)
+
+        with ExcelWriter(filepath) as writer:
+            df.to_excel(writer)
+
+    def generate_zone_schools(self):
+        zone_schools = []
+
+        schools_list = self.schools.copy()
+        
+        random.shuffle(schools_list['ESC1'])
+        random.shuffle(schools_list['ESC2'])
+        random.shuffle(schools_list['ESC3'])
+        random.shuffle(schools_list['ESCSEC'])
+
+        zone_schools.append(schools_list['ESC1'][0])
+        zone_schools.append(schools_list['ESC2'][0])
+        zone_schools.append(schools_list['ESC3'][0])
+        zone_schools.append(schools_list['ESCSEC'][0])
+
+        return zone_schools
+
+    def generate_zone_workplaces(self, n_prim, n_sec, n_tert):
+        prim_weights = []
+        sec_weights = []
+        tert_weights = []
+
+        for workplace in self.workplaces['Primary']:
+            prim_weights.append(self.get_weight_by_size(workplace['size']))
+        for workplace in self.workplaces['Secondary']:
+            sec_weights.append(self.get_weight_by_size(workplace['size']))
+        for workplace in self.workplaces['Tertiary']:
+            tert_weights.append(self.get_weight_by_size(workplace['size']))
+        
+        prim_workplaces = random.choices(self.workplaces['Primary'], weights=prim_weights, k=n_prim)
+        sec_workplaces = random.choices(self.workplaces['Secondary'], weights=sec_weights, k=n_sec)
+        tert_workplaces = random.choices(self.workplaces['Tertiary'], weights=tert_weights, k=n_tert)
+
+        workplaces = prim_workplaces + sec_workplaces + tert_workplaces
+
+        return workplaces
+
+        
+
+
+    def get_weight_by_size(self, size):
+        if size is 1:
+            return 5
+        elif size is 2:
+            return 15
+        elif size is 3:
+            return 80
+        elif size is 4:
+            return 200
 
 survey_generator = SurveyGenerator()
