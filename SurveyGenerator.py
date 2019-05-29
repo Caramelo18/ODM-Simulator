@@ -207,9 +207,6 @@ class SurveyGenerator:
 
         return workplaces
 
-        
-
-
     def get_weight_by_size(self, size):
         if size is 1:
             return 5

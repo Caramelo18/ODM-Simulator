@@ -93,11 +93,25 @@ class Population:
         
         self.natality_distribution = dist
     
+    def set_migrations(self, data):
+        print("Fitting migration distribution")
+        
+        r = []
+        for i in range(len(data)):
+            num = data[i]
+            for j in range(num):
+                r.append(i)
+
+        dist = Distribution(in_range=False)
+        dist.Fit(r)
+        
+        self.migrations_distribution = dist
     
     def train_predictiors(self):
         print("Initializing predictors")
         self.predictor.init_mortality_predictor()
-        self.predictor.init_natality_predictor()
+        # self.predictor.init_natality_predictor()
+        self.predictor.init_migration_predictor()
 
     def add_person(self, person):
         self.persons.append(person)
@@ -206,22 +220,19 @@ class Population:
         print("Step {} - {} persons were born".format(self.step_num, len(mothers_age_ranges)))
 
     def simulate_migrations(self):
-        num_income_people = MIGR_FROM_OUT / FREG_POMB_POP * 0.75
-        num_income_people = int(num_income_people * self.get_population_size())
-        migr_balance = int(MIGRATORY_BALANCE['2017'] * FREG_POMB_POP / MUN_POMB_POP)
-        num_outcome_people = num_income_people - migr_balance
-
-        rand_inc = int(np.random.normal(0, int(num_income_people * 0.02)))
-        rand_out = int(np.random.normal(0, int(num_outcome_people * 0.02)))
-
-        num_income_people += rand_inc
-        num_outcome_people += rand_out
-
-        migr_bal = num_income_people - num_outcome_people
-
-        # TODO: age missing for migrations - how to to it?
+        num_persons_out = self.predictor.predict_migrations(self.get_population_size())
+        num_persons_out = abs(num_persons_out)
         
-        print("Step {} - {} new persons entered and {} left".format(self.step_num, num_income_people, num_outcome_people))
+        migration_age_ranges = self.migrations_distribution.Random(n=num_persons_out)
+        age_ranges = Parser.get_age_ranges()
+        
+        for age_range in migration_age_ranges:
+            (a, b) = age_ranges[age_range]
+            person = self.get_random_person_in_age_range(a, b)
+            self.remove_person(person)
+            
+        #TODO: add stats for persons that left
+        print("Step {} - {} persons left".format(self.step_num, num_persons_out))
 
 
     def get_random_person_by_age(self, age):

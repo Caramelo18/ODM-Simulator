@@ -13,9 +13,9 @@ import warnings
 # Source: http://www.insightsbot.com/blog/WEjdW/fitting-probability-distributions-with-python-part-1
 class Distribution(object):
     
-    def __init__(self,dist_names_list = [], custom_dist = True):
+    def __init__(self,dist_names_list = [], custom_dist = True, in_range = True):
         if custom_dist:
-            self.dist_names = ["genlogistic", "johnsonsu"]
+            self.dist_names = ["genlogistic", "johnsonsu", "moyal"]
         else:
             self.dist_names = [d for d in dir(scipy.stats) if isinstance(getattr(scipy.stats, d), scipy.stats.rv_continuous)] # ['norm','lognorm','expon']
             
@@ -30,6 +30,8 @@ class Distribution(object):
 
         self.min_val = 9999999
         self.max_val = -9999999
+
+        self.in_range = in_range
         
         
     def Fit(self, y):
@@ -73,7 +75,10 @@ class Distribution(object):
                 for i in range(len(num)):
                     num[i] = round(num[i], 0)
                 num = num.astype(int)
-            return self.Filter(num)
+            if self.in_range:
+                return self.Filter(num)
+            else:
+                return num
         else:
             raise ValueError('Must first run the Fit method.')
     
@@ -132,3 +137,15 @@ class Distribution(object):
         
 # dist.Fit(r1)
 # dist.Plot(r1)
+
+# migrations = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
+# r = []
+# for i in range(len(migrations)):
+#     num = migrations[i]
+#     for j in range(num):
+#         r.append(i)
+
+# print(r)
+# dist = Distribution(in_range=False)
+# dist.Fit(r)
+# dist.Plot(r)

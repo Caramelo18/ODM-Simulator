@@ -15,6 +15,7 @@ NUM_STEPS = 3
 def simulate(population):
     population.get_stats().get_population_age_stats()
     for _ in range(NUM_STEPS):
+        #TODO: store age distribution for each step
         print(population.get_population_age_distribution())
         population.step()
 
@@ -43,9 +44,12 @@ def main():
 
     mortality_data = Parser.get_mortality_data()
     natality_data = Parser.get_natality_data()
+    migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
+
     population = DataGenerator.init_population_census_2011()
     population.set_mortality(mortality_data)
     population.set_natality(natality_data)
+    population.set_migrations(migrations_ages)
     population.train_predictiors()
 
     # population.get_population_age_distribution()

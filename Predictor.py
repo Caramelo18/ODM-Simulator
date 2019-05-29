@@ -12,6 +12,8 @@ class Predictor:
         #ADR   - 0.85
         self.natality_predictor = linear_model.BayesianRidge()
 
+        self.migration_predictor = linear_model.LinearRegression()
+
         self.mortality_offset = 1000000
     
     def init_mortality_predictor(self):
@@ -90,7 +92,30 @@ class Predictor:
 
         
         self.evaluate_natality(population_data, natality_data)
+    
+    def init_migration_predictor(self):
+        balances = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015': 161, '2016': -217, '2017': -250}
+        #TODO: remove 2015?!
 
+        population_data = Parser.get_population_data()
+        total_population = []
+        for year in population_data:
+            total_population.append(sum(population_data[year].values()))
+        total_population.reverse()
+        
+        x = np.arange(len(balances.keys()))
+        x = x[:, np.newaxis]
+        y = list(balances.values())
+
+        for i in range(len(y)):
+            migr = y[i]
+            pop = total_population[i]
+            y[i] = migr / pop 
+                
+        self.migration_predictor.fit(x, y)
+        
+        self.tick = len(x) 
+        self.evaluate_migrations(x, y)
     
     def predict_mortality(self, age_distribution):
         data = preprocessing.scale(age_distribution)
@@ -99,6 +124,16 @@ class Predictor:
         pred = int(pred * total)
         # print("Predicted Mortality: ", pred)
         return pred
+
+    def predict_migrations(self, population_number):
+        x = np.asarray([self.tick])
+        x = x[:, np.newaxis]
+        
+        result = self.migration_predictor.predict(x)
+        self.tick += 1
+        
+        result = int(round(result[0] * population_number, 0))
+        return result
 
     def evaluate_mortality(self, population_data, mortality_data):
         pred = cross_val_predict(self.mortality_predictor, population_data, mortality_data, cv=7)
@@ -112,6 +147,11 @@ class Predictor:
         
         print("Natality R2 Score:", score)
 
+    def evaluate_migrations(self, x, y):
+        score = self.migration_predictor.score(x, y)
+        print("Migration R2 Score:", score)
+
 # p = Predictor()
 # p.init_mortality_predictor()
 # p.init_natality_predictor()
+# p.init_migration_predictor()
