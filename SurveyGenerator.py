@@ -5,7 +5,7 @@ import numpy as np
 from shapely.geometry import Point, shape
 from pandas import pandas, ExcelWriter
 
-import DataGenerator
+import PopulationGenerator
 
 basepath = 'data/' 
 
@@ -81,7 +81,7 @@ class SurveyGenerator:
         filepath = basepath + "pombal-detailed.csv"
         df = pandas.read_csv(filepath)
 
-        resize_ratio = DataGenerator.get_resize_ratio()
+        resize_ratio = PopulationGenerator.get_resize_ratio()
         
         for i, row in df.iterrows():
             tot = int(round(row['Total'] * resize_ratio, 0))
@@ -107,7 +107,7 @@ class SurveyGenerator:
         for _, row in self.population_distibution.iterrows():
             obj = {'from': row['Localidade']}
             for occupation in occupations:
-                rand_perc = np.random.normal(20, 8) / 100
+                rand_perc = np.random.normal(20, 5) / 100
                 num = int(round(row[occupation] * rand_perc, 0))
                 obj[occupation] = num
 

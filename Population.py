@@ -3,7 +3,6 @@ from Enums import PersonClass, Schools
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
-import utils
 import random
 from Person import Person
 from Stats import Stats
@@ -85,7 +84,6 @@ class Population:
             key = list(data.keys())[i]
             num = int(data[key])
             for _ in range(num):
-                rng = i + 1
                 r.append(i + 1)
 
         dist = Distribution()
@@ -99,7 +97,7 @@ class Population:
         r = []
         for i in range(len(data)):
             num = data[i]
-            for j in range(num):
+            for _ in range(num):
                 r.append(i)
 
         dist = Distribution(in_range=False)

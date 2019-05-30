@@ -21,9 +21,7 @@ class Predictor:
         mortality_data.pop(2018, None)
         population_data = Parser.get_population_data()
 
-        years = list(population_data.keys())
 
-        # print(years)
         mortality_data = list(mortality_data.values())
         population_data = list(population_data.values())
 
@@ -34,10 +32,8 @@ class Predictor:
         pop_data = []
         for val in population_data:
             rng = list(val.values())
-            # rng = [x / sum(rng) for x in rng]
             pop_data.append(rng)
 
-            
         mortality_data = np.array(mortality_data)
         population_data = np.array(pop_data).astype(float)
 
@@ -45,7 +41,7 @@ class Predictor:
 
         k_fold = KFold(n_splits=7)
 
-        for train_index, test_index in k_fold.split(mortality_data):
+        for train_index, _ in k_fold.split(mortality_data):
         #     print("train indices:", train_index)
         #     print("train data:", population_data[train_index])
         #     print("test indices:", test_index)
@@ -59,7 +55,6 @@ class Predictor:
         natality_data.pop(2018, None)
         population_data = Parser.get_population_data()
 
-        years = list(population_data.keys())
 
         natality_data = list(natality_data.values())
         population_data = list(population_data.values())
@@ -67,7 +62,6 @@ class Predictor:
         for i in range(len(natality_data)):
             perc = natality_data[i] / sum(population_data[i].values())
             natality_data[i] = perc 
-
 
         pop_data = []
         for val in population_data:
@@ -83,7 +77,7 @@ class Predictor:
 
         k_fold = KFold(n_splits=7)
 
-        for train_index, test_index in k_fold.split(natality_data):
+        for train_index, _ in k_fold.split(natality_data):
             # print("train indices:", train_index)
             # print("train data:", population_data[train_index])
             # print("test indices:", test_index)
