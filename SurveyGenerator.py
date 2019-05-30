@@ -107,7 +107,7 @@ class SurveyGenerator:
         for _, row in self.population_distibution.iterrows():
             obj = {'from': row['Localidade']}
             for occupation in occupations:
-                rand_perc = np.random.normal(20, 5) / 100
+                rand_perc = np.random.normal(30, 5) / 100
                 num = int(round(row[occupation] * rand_perc, 0))
                 obj[occupation] = num
 
@@ -122,9 +122,12 @@ class SurveyGenerator:
         self.columns = df.columns.tolist()
 
     def fill_students_surveys(self):
+        print("Generating students surveys")
         filepath = basepath + "registo-od-generated-students.xlsx"
 
         row_list = []
+
+        students_columns = self.columns + ['SCHOOL-TYPE']
 
         for place in self.surveys_to_generate:
             origin = place['from']
@@ -137,19 +140,24 @@ class SurveyGenerator:
                 d['ORG-LUG'] = origin
                 school = schools[random.randint(0, len(schools) - 1)]
                 d['DEST-LUG'] = school['zone']
+                d['SCHOOL-TYPE'] = school['type']
                 row_list.append(d)
 
         random.shuffle(row_list)
 
-        df = pandas.DataFrame(row_list, columns=self.columns)
+        df = pandas.DataFrame(row_list, columns=students_columns)
 
         with ExcelWriter(filepath) as writer:
             df.to_excel(writer)
 
     def fill_workers_surveys(self):
+        print("Generating workers surveys")
+
         filepath = basepath + "registo-od-generated-workers.xlsx"
 
         row_list = []
+
+        workers_columns = self.columns + ['WORK-TYPE']
 
         for place in self.surveys_to_generate:
             origin = place['from']
@@ -161,11 +169,12 @@ class SurveyGenerator:
                 d = dict.fromkeys(self.columns, '')
                 d['ORG-LUG'] = origin
                 d['DEST-LUG'] = workplace['zone']
+                d['WORK-TYPE'] = workplace['type']
                 row_list.append(d)
 
         random.shuffle(row_list)
 
-        df = pandas.DataFrame(row_list, columns=self.columns)
+        df = pandas.DataFrame(row_list, columns=workers_columns)
 
         with ExcelWriter(filepath) as writer:
             df.to_excel(writer)

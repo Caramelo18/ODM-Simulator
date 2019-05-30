@@ -6,14 +6,11 @@ import PopulationGenerator
 import Parser
 import matplotlib.pyplot as plt
 
-POPULATION_SIZE = 100
-NUM_SECTIONS = 29
 NUM_STEPS = 3
 
 def simulate(population):
     for _ in range(NUM_STEPS):
         population.step()
-
 
 def main():
     print("Loading natality and mortality data")

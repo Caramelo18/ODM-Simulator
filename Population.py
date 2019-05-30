@@ -39,14 +39,13 @@ FREG_POMB_POP = 17187
 BIRTH_RANGES = [(10,14), (15,19), (20,24), (25,29), (30,34), (35,39), (40,44), (45,49), (50,120)]
 
 class Population:
-    def __init__(self, num_places):
+    def __init__(self):
         self.persons = []
-        self.num_places = num_places
+        self.zones = []
         self.step_num = 0
         self.dynamics = Dynamics(self)
         self.stats = Stats(self)
         self.predictor = Predictor()
-
 
     def get_dynamics(self):
         self.dynamics.get_persons_by_class_and_zone(PersonClass.CLASS3, 57)
@@ -59,6 +58,9 @@ class Population:
 
     def get_stats(self):
         return self.stats
+
+    def set_zones(self, zones):
+        self.zones = zones
 
     def set_mortality(self, data):
         print("Fitting mortality distribution")
@@ -73,8 +75,7 @@ class Population:
         dist.Fit(r)
 
         self.mortality_distribution = dist
-        
-        
+                
     def set_natality(self, data):
         print("Fitting natality distribution")
         data.pop('total_births', None)
