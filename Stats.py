@@ -10,6 +10,7 @@ class Stats:
         self.population = population
         self.natality_stats = {}
         self.mortality_stats = {}
+        self.migration_stats = {}
 
     def get_persons_by_class(self, person_class):
         persons = []
@@ -55,6 +56,9 @@ class Stats:
     
     def add_mortality_stats(self, step, data):
         self.mortality_stats[step] = data
+    
+    def add_migration_stats(self, step, data):
+        self.migration_stats[step] = data
 
     def show_natality_chart(self):
         steps = self.natality_stats.keys()

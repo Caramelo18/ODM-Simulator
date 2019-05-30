@@ -225,15 +225,25 @@ class Population:
         
         migration_age_ranges = self.migrations_distribution.Random(n=num_persons_out)
         age_ranges = Parser.get_age_ranges()
-        
-        for age_range in migration_age_ranges:
-            (a, b) = age_ranges[age_range]
-            person = self.get_random_person_in_age_range(a, b)
-            self.remove_person(person)
-            
-        #TODO: add stats for persons that left
-        print("Step {} - {} persons left".format(self.step_num, num_persons_out))
 
+        outcome_ages = []
+        
+        for i in range(len(migration_age_ranges)):
+            age_range = migration_age_ranges[i]
+
+            if age_range >= len(age_ranges):
+                migration_age_ranges[i] = self.migrations_distribution.Random(n=1)[0]
+                age_range = migration_age_ranges[i]
+
+            (a, b) = age_ranges[age_range]
+            
+            person = self.get_random_person_in_age_range(a, b)
+            outcome_ages.append(person.get_age())
+            self.remove_person(person)
+
+        self.stats.add_migration_stats(self.step_num, outcome_ages)
+
+        print("Step {} - {} persons left".format(self.step_num, num_persons_out))
 
     def get_random_person_by_age(self, age):
         possible_persons = []
