@@ -141,6 +141,8 @@ def get_resize_ratio():
     return ratio
 
 def init_population_census_2011():
+    print("Initializing population")
+
     filepath = basepath + "pombal-detailed.csv"
     df = pandas.read_csv(filepath)
 
@@ -179,9 +181,9 @@ def init_population_census_2011():
             num_age_range = senior_distribution[(a,b)]
             population.add_batch_age_range(num_age_range, lugar, a, b)
 
-    print(population)
-    print(population.get_population_age_distribution())
-    # get_senior_age_distribution()
+    population.get_stats().add_age_distribution_stats(0, population.get_population_age_distribution())
+    print("Population initialized - Total population: {}".format(population.get_population_size()))
+    population.get_stats().print_population_age_stats()
 
     return population
 

@@ -11,6 +11,7 @@ class Stats:
         self.natality_stats = {}
         self.mortality_stats = {}
         self.migration_stats = {}
+        self.age_distributions = {}
 
     def get_persons_by_class(self, person_class):
         persons = []
@@ -35,7 +36,7 @@ class Stats:
         plt.ylabel("Number of Persons")
         plt.show()
 
-    def get_population_age_stats(self):
+    def print_population_age_stats(self):
         ages = []
 
         for person in self.population.get_persons():
@@ -59,6 +60,9 @@ class Stats:
     
     def add_migration_stats(self, step, data):
         self.migration_stats[step] = data
+
+    def add_age_distribution_stats(self, step, data):
+        self.age_distributions[step] = data
 
     def show_natality_chart(self):
         steps = self.natality_stats.keys()

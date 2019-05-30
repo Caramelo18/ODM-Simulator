@@ -138,16 +138,17 @@ class Population:
         return ret
 
     def step(self):
+        self.step_num += 1
         self.step_people()
             
         self.simulate_mortality()
         self.simulate_natality()
         self.simulate_migrations()
 
-        print(self)
-        self.step_num += 1
+        self.stats.add_age_distribution_stats(self.step_num, self.get_population_age_distribution())
 
-        self.stats.get_population_age_stats()
+        print(self)
+        self.stats.print_population_age_stats()
 
     def step_people(self):
         for person in self.persons:
