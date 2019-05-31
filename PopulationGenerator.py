@@ -28,6 +28,8 @@ def init_population_census_2011():
     ratio = get_resize_ratio()
     
     zones = df['Localidade'].tolist()
+    population = Population()
+    population.set_zones(zones)
     
     for index, row in df.iterrows():
         new_num_pop = 0
@@ -37,10 +39,7 @@ def init_population_census_2011():
             df.loc[index, rng] = age_num
         df.loc[index, 'Total'] = new_num_pop
         
-    population = Population()
-    population.set_zones(zones)
-
-
+    
     for _, row in df.iterrows():
         lugar = row['Localidade']
         for i in range(len(AGE_RANGES) - 2):

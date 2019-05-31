@@ -1,15 +1,18 @@
 from collections import Counter
 from pandas import pandas
+from ShapefileHelper import ShapefileHelper
 import numpy as np
 import copy
 import random
 import sys
+
 basepath = 'data/'
 
 class Dynamics:
     def __init__(self, population):
         self.population = population
         self.zones = []
+        self.shapefile_helper = ShapefileHelper()
         self.read_student_surveys('registo-od-generated-students.xlsx')
         np.set_printoptions(threshold=np.inf, linewidth=250)
         # self.read_workers_surveys('registo-od-generated-workers.xlsx')
@@ -68,10 +71,33 @@ class Dynamics:
                     schools_perc[zone] = schools_count[zone] / num_school_surveys
                 schools_distribution[origin][school_type] = schools_perc
 
+        
         self.schools_distribution = schools_distribution
+
+    def correct_students_data(self):
+        for zone in self.zones:
+            if zone not in self.schools_distribution:
+                self.schools_distribution[zone] = {'ESC1': {}, 'ESC2': {}, 'ESC3': {}, 'ESCSEC': {}}
+                
+        closest_zones = self.shapefile_helper.find_nearest_points()
+        print(closest_zones)
+        for origin in self.schools_distribution:
+            zone_data = self.schools_distribution[origin]
+            for school_type in zone_data:
+                num_schools = len(zone_data[school_type])
+                if num_schools is 0:
+                    closest_zone_index = closest_zones[self.get_zone_index(origin)]
+                    closest_zone = self.zones[closest_zone_index]
+                    #TODO: check closest_zone correctness
+                    closest_zone_school = self.schools_distribution[closest_zone][school_type]
+                    print(origin, closest_zone, closest_zone_school)
+
         
     def init_od_matrix(self):
         self.zones = self.population.zones
+        
+        self.correct_students_data()
+
         num_zones = len(self.zones)
 
         self.matrix = np.zeros(shape=(num_zones, num_zones), dtype=int)
@@ -125,10 +151,13 @@ class Dynamics:
         new_matrix[len(matrix)] = attraction
 
         self.matrix = new_matrix
-        print(self.matrix)
-        
+        self.save_matrix_to_csv(self.matrix)     
 
-    #TODO: save matrix to csv
+    def save_matrix_to_csv(self, matrix):
+        print("Saving matrix to CSV")
+        basepath = 'matrices/'
+        filepath = basepath + 'odm.csv'
+        pandas.DataFrame(matrix).to_csv(filepath)
     
     def get_school_type_by_age(self, age):
         if age > 5 and age < 10:
