@@ -13,9 +13,9 @@ class Dynamics:
         self.population = population
         self.zones = []
         self.shapefile_helper = ShapefileHelper()
-        self.read_student_surveys('registo-od-generated-students.xlsx')
         np.set_printoptions(threshold=np.inf, linewidth=250)
-        # self.read_workers_surveys('registo-od-generated-workers.xlsx')
+        # self.read_student_surveys('registo-od-generated-students.xlsx')
+        self.read_workers_surveys('registo-od-generated-workers.xlsx')
          
     def get_persons_by_class_and_zone(self, person_class, origin_zone):
         persons = []
@@ -57,6 +57,22 @@ class Dynamics:
 
         df = pandas.read_excel(filepath)
 
+        data = {}
+
+        for _, row in df.iterrows():
+            origin = row['ORG-LUG']
+            workplace_zone = row['DEST-LUG']
+            workplace_type = row['WORK-TYPE']
+            if origin not in data:
+                data[origin] = {'dest': [], 'type': []}
+            data[origin]['dest'].append(workplace_zone)
+            data[origin]['type'].append(workplace_type)
+
+        self.workers_data = data
+
+        self.process_workers_data()
+
+
     def process_students_data(self):
         schools_distribution = {}
         for origin in self.sudents_data:
@@ -71,9 +87,22 @@ class Dynamics:
                     schools_perc[zone] = schools_count[zone] / num_school_surveys
                 schools_distribution[origin][school_type] = schools_perc
 
-        
         self.schools_distribution = schools_distribution
 
+    def process_workers_data(self):
+        workplaces_distribution = {}
+
+        for origin in self.workers_data:
+            zone_data = self.workers_data[origin]['dest']
+            counts = Counter(zone_data)
+            num_answers = len(zone_data)
+            zone_destinations = {}
+            for zone in counts:
+                zone_destinations[zone] = counts[zone] / num_answers
+            workplaces_distribution[origin] = zone_destinations
+        
+        self.workplaces_distribution = workplaces_distribution
+        
     def correct_students_data(self):
         for zone in self.zones:
             if zone not in self.schools_distribution:
@@ -99,11 +128,17 @@ class Dynamics:
                     i += 1
 
                 self.schools_distribution[origin][school_type] = closest_zone_schools
-            
+
+    def correct_workers_data(self):
+        for zone in self.zones:
+            if zone not in self.workplaces_distribution:
+                self.workplaces_distribution[zone] = {}
+                    
     def init_od_matrix(self):
         self.zones = self.population.zones
         
-        self.correct_students_data()
+        # self.correct_students_data()
+        self.correct_workers_data()
 
         num_zones = len(self.zones)
 
@@ -129,7 +164,7 @@ class Dynamics:
 
     def get_od_matrix(self):
         self.init_od_matrix()
-        self.fill_matrix_students()
+        # self.fill_matrix_students()
         # self.fill_matrix_workers()
         self.append_zones_totals()
 
@@ -157,7 +192,7 @@ class Dynamics:
         new_matrix[len(matrix)] = attraction
 
         self.matrix = new_matrix
-        self.save_matrix_to_csv(self.matrix)     
+        # self.save_matrix_to_csv(self.matrix)     
 
     def save_matrix_to_csv(self, matrix):
         print("Saving matrix to CSV")
