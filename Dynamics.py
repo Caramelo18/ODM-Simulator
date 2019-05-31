@@ -78,21 +78,28 @@ class Dynamics:
         for zone in self.zones:
             if zone not in self.schools_distribution:
                 self.schools_distribution[zone] = {'ESC1': {}, 'ESC2': {}, 'ESC3': {}, 'ESCSEC': {}}
-                
+
         closest_zones = self.shapefile_helper.find_nearest_points()
-        print(closest_zones)
+        
         for origin in self.schools_distribution:
             zone_data = self.schools_distribution[origin]
             for school_type in zone_data:
                 num_schools = len(zone_data[school_type])
-                if num_schools is 0:
-                    closest_zone_index = closest_zones[self.get_zone_index(origin)]
-                    closest_zone = self.zones[closest_zone_index]
-                    #TODO: check closest_zone correctness
-                    closest_zone_school = self.schools_distribution[closest_zone][school_type]
-                    print(origin, closest_zone, closest_zone_school)
+                closest_zone = None
+                closest_zone_schools = None
+                i = 0
+                if num_schools is not 0:
+                    continue
+                while num_schools is 0:
+                    closest_zones_indexes = closest_zones[self.get_zone_index(origin)]
+                    (_, index) = closest_zones_indexes[i]
+                    closest_zone = self.zones[index]
+                    closest_zone_schools = self.schools_distribution[closest_zone][school_type]
+                    num_schools = len(closest_zone_schools)
+                    i += 1
 
-        
+                self.schools_distribution[origin][school_type] = closest_zone_schools
+            
     def init_od_matrix(self):
         self.zones = self.population.zones
         
@@ -109,8 +116,7 @@ class Dynamics:
                 origin = person.get_origin()
                 origin_index = self.get_zone_index(origin)
                 schools = self.schools_distribution[origin][school_type]
-                if len(schools) is 0: #TODO: GET THE CLOSEST ZONE WITH SCHOOL
-                    continue
+                
                 zones = list(schools.keys())
                 probabilites = list(schools.values())
                 dest = self.choose_destination(zones, probabilites)

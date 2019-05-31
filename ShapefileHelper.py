@@ -1,6 +1,7 @@
 import shapely
 import shapefile
 import sys
+import heapq
 from shapely.geometry import Point, shape
 
 class ShapefileHelper:
@@ -26,7 +27,7 @@ class ShapefileHelper:
             names.append(name)
             centers[name] = center_coords
             
-        self.zones_names = names
+        self.zones_names = sorted(names)
         self.centers = centers
 
     def find_nearest_points(self):
@@ -34,20 +35,18 @@ class ShapefileHelper:
 
         for point_a_name in self.centers:
             point_a = self.centers[point_a_name]
-            min_dist = sys.maxsize
-            min_dist_name = ""
+            min_dist_list = []
             for point_b_name in self.centers:
                 point_b = self.centers[point_b_name]
+                point_b_index = self.get_zone_index(point_b_name)
                 dist = point_a.distance(point_b)
-                if dist < min_dist and dist > 0:
-                    min_dist = dist
-                    min_dist_name = point_b_name
-            nearest_zones[self.get_zone_index(point_a_name)] = self.get_zone_index(min_dist_name)
+                if dist > 0:
+                    heapq.heappush(min_dist_list, (dist, point_b_index))
+                
+            nearest_zones[self.get_zone_index(point_a_name)] = min_dist_list
 
         return nearest_zones
     
     def get_zone_index(self, zone):
         return self.zones_names.index(zone)
                 
-
-shapefile_helper = ShapefileHelper()
