@@ -24,6 +24,8 @@ class ShapefileHelper:
             shape_geom = shape(shape_record.__geo_interface__['geometry'])
             center_coords = shape_geom.centroid
             name = self.all_records[i][8]
+            if 'Casal Fern' in name:
+                name = 'Casal Fernão João' 
             names.append(name)
             centers[name] = center_coords
             

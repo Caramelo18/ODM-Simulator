@@ -13,8 +13,10 @@ class Dynamics:
         self.population = population
         self.zones = []
         self.shapefile_helper = ShapefileHelper()
+        
         np.set_printoptions(threshold=np.inf, linewidth=250)
-        # self.read_student_surveys('registo-od-generated-students.xlsx')
+
+        self.read_student_surveys('registo-od-generated-students.xlsx')
         self.read_workers_surveys('registo-od-generated-workers.xlsx')
          
     def get_persons_by_class_and_zone(self, person_class, origin_zone):
@@ -62,6 +64,8 @@ class Dynamics:
         for _, row in df.iterrows():
             origin = row['ORG-LUG']
             workplace_zone = row['DEST-LUG']
+            if 'Casal Fern' in workplace_zone:
+                workplace_zone = 'Casal Fernão João' 
             workplace_type = row['WORK-TYPE']
             if origin not in data:
                 data[origin] = {'dest': [], 'type': []}
@@ -137,7 +141,7 @@ class Dynamics:
     def init_od_matrix(self):
         self.zones = self.population.zones
         
-        # self.correct_students_data()
+        self.correct_students_data()
         self.correct_workers_data()
 
         num_zones = len(self.zones)
@@ -158,14 +162,27 @@ class Dynamics:
                 dest_index = self.get_zone_index(dest)
                 self.matrix[origin_index][dest_index] += 1
 
-                
     def fill_matrix_workers(self):
-        print("Workers")
+        for person in self.population.get_persons():
+            age = person.get_age()
+            if age > 19 and age < 65:
+                origin = person.get_origin()
+                origin_index = self.get_zone_index(origin)
+
+                zone_workplaces = self.workplaces_distribution[origin]
+                zones = list(zone_workplaces.keys())
+                probabilites = list(zone_workplaces.values())
+                dest = self.choose_destination(zones, probabilites)
+                dest_index = self.get_zone_index(dest)
+                self.matrix[origin_index][dest_index] += 1
+
 
     def get_od_matrix(self):
         self.init_od_matrix()
-        # self.fill_matrix_students()
-        # self.fill_matrix_workers()
+
+        self.fill_matrix_students()
+        self.fill_matrix_workers()
+
         self.append_zones_totals()
 
     def get_zone_index(self, zone):
@@ -192,7 +209,7 @@ class Dynamics:
         new_matrix[len(matrix)] = attraction
 
         self.matrix = new_matrix
-        # self.save_matrix_to_csv(self.matrix)     
+        self.save_matrix_to_csv(self.matrix)     
 
     def save_matrix_to_csv(self, matrix):
         print("Saving matrix to CSV")
