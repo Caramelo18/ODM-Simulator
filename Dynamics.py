@@ -145,10 +145,15 @@ class Dynamics:
         self.correct_workers_data()
 
         num_zones = len(self.zones)
-
-        self.matrix = np.zeros(shape=(num_zones, num_zones), dtype=int)
+        base_matrix = np.zeros(shape=(num_zones, num_zones), dtype=int)
+        self.matrices = {'ESC1': np.copy(base_matrix), 'ESC2': np.copy(base_matrix), 'ESC3': np.copy(base_matrix), 'ESCSEC': np.copy(base_matrix), 'WORKERS': np.copy(base_matrix)}
 
     def fill_matrix_students(self):
+        try: 
+            self.matrices
+        except AttributeError:
+            self.init_od_matrix()
+            
         for person in self.population.get_persons():
             school_type = self.get_school_type_by_age(person.get_age())
             if school_type is not None:
@@ -160,9 +165,14 @@ class Dynamics:
                 probabilites = list(schools.values())
                 dest = self.choose_destination(zones, probabilites)
                 dest_index = self.get_zone_index(dest)
-                self.matrix[origin_index][dest_index] += 1
+                self.matrices[school_type][origin_index][dest_index] += 1
 
     def fill_matrix_workers(self):
+        try: 
+            self.matrices
+        except AttributeError:
+            self.init_od_matrix()
+
         for person in self.population.get_persons():
             age = person.get_age()
             if age > 19 and age < 65:
@@ -174,7 +184,7 @@ class Dynamics:
                 probabilites = list(zone_workplaces.values())
                 dest = self.choose_destination(zones, probabilites)
                 dest_index = self.get_zone_index(dest)
-                self.matrix[origin_index][dest_index] += 1
+                self.matrices['WORKERS'][origin_index][dest_index] += 1
 
 
     def get_od_matrix(self):
@@ -193,29 +203,46 @@ class Dynamics:
         return destination[0]
 
     def append_zones_totals(self):
-        matrix = self.matrix
-        new_len = len(matrix) + 1
-        new_matrix = np.zeros(shape=(new_len, new_len), dtype=int)
-        new_matrix = new_matrix.astype(int)
         
-        for i in range(len(matrix)):
-            line = matrix[i]
-            total = sum(line)
-            total = np.array([total])
-            new_line = np.concatenate((line, total), axis=0)
-            new_matrix[i] = new_line
-        
-        attraction = np.sum(new_matrix, axis = 0)
-        new_matrix[len(matrix)] = attraction
+        for matrix_type in self.matrices:
+            matrix = self.matrices[matrix_type]
+            new_len = len(matrix) + 1
+            new_matrix = np.zeros(shape=(new_len, new_len), dtype=int)
+            new_matrix = new_matrix.astype(int)
+            
+            for i in range(len(matrix)):
+                line = matrix[i]
+                total = sum(line)
+                total = np.array([total])
+                new_line = np.concatenate((line, total), axis=0)
+                new_matrix[i] = new_line
+            
+            attraction = np.sum(new_matrix, axis = 0)
+            new_matrix[len(matrix)] = attraction
+            self.matrices[matrix_type] = new_matrix
 
-        self.matrix = new_matrix
-        self.save_matrix_to_csv(self.matrix)     
+        self.save_matrices_to_csv()     
 
-    def save_matrix_to_csv(self, matrix):
+    def save_matrices_to_csv(self, step=None):
         print("Saving matrix to CSV")
         basepath = 'matrices/'
-        filepath = basepath + 'odm.csv'
-        pandas.DataFrame(matrix).to_csv(filepath)
+        filepath = basepath + 'odm-{}'
+        if step is not None:
+            filepath = filepath + 'step{}'.format(step)
+        filepath = filepath + '.csv'
+
+        matrix_size = len(self.matrices['ESC1'])
+        aggregate_matrix = np.zeros(shape=(matrix_size, matrix_size), dtype=int)
+
+        labels = self.zones + ['Total']
+
+        for matrix_type in self.matrices:
+            filename = filepath.format(matrix_type)
+            aggregate_matrix = np.add(aggregate_matrix, self.matrices[matrix_type], dtype=int)
+            pandas.DataFrame(self.matrices[matrix_type], index=labels, columns=labels).to_csv(filename)
+        
+        filename = filepath.format('aggregate')
+        pandas.DataFrame(aggregate_matrix, index=labels, columns=labels).to_csv(filename)
     
     def get_school_type_by_age(self, age):
         if age > 5 and age < 10:
