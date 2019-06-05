@@ -6,11 +6,12 @@ import PopulationGenerator
 import Parser
 import matplotlib.pyplot as plt
 
-NUM_STEPS = 3
+NUM_STEPS = 5
 
 def simulate(population):
     for _ in range(NUM_STEPS):
         population.step()
+        population.dynamics.get_od_matrix(step=population.step_num)
 
 def main():
     print("Loading natality and mortality data")

@@ -144,9 +144,17 @@ class Dynamics:
         self.correct_students_data()
         self.correct_workers_data()
 
+        self.reset_matrices()
+
+    def reset_matrices(self):
         num_zones = len(self.zones)
-        base_matrix = np.zeros(shape=(num_zones, num_zones), dtype=int)
-        self.matrices = {'ESC1': np.copy(base_matrix), 'ESC2': np.copy(base_matrix), 'ESC3': np.copy(base_matrix), 'ESCSEC': np.copy(base_matrix), 'WORKERS': np.copy(base_matrix)}
+        
+        types = ['ESC1', 'ESC2', 'ESC3', 'ESCSEC', 'WORKERS']
+
+        self.matrices = {}
+
+        for matrix_cat in types:
+            self.matrices[matrix_cat] = np.zeros(shape=(num_zones, num_zones), dtype=int)
 
     def fill_matrix_students(self):
         try: 
@@ -187,11 +195,15 @@ class Dynamics:
                 self.matrices['WORKERS'][origin_index][dest_index] += 1
 
 
-    def get_od_matrix(self):
+    def get_od_matrix(self, step=None):
         self.fill_matrix_students()
         self.fill_matrix_workers()
 
         self.append_zones_totals()
+
+        self.save_matrices_to_csv(step=step)
+
+        self.reset_matrices()
 
     def get_zone_index(self, zone):
         return self.zones.index(zone)
@@ -217,16 +229,14 @@ class Dynamics:
             
             attraction = np.sum(new_matrix, axis = 0)
             new_matrix[len(matrix)] = attraction
-            self.matrices[matrix_type] = new_matrix
-
-        self.save_matrices_to_csv()     
+            self.matrices[matrix_type] = new_matrix 
 
     def save_matrices_to_csv(self, step=None):
         print("Saving matrix to CSV")
         basepath = 'matrices/'
         filepath = basepath + 'odm-{}'
         if step is not None:
-            filepath = filepath + 'step{}'.format(step)
+            filepath = filepath + '-step{}'.format(step)
         filepath = filepath + '.csv'
 
         matrix_size = len(self.matrices['ESC1'])
