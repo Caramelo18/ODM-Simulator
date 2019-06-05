@@ -21,7 +21,6 @@ class Predictor:
         mortality_data.pop(2018, None)
         population_data = Parser.get_population_data()
 
-
         mortality_data = list(mortality_data.values())
         population_data = list(population_data.values())
 

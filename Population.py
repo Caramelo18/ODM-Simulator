@@ -195,7 +195,7 @@ class Population:
             print("ERROR: No natality data loaded")
             exit(1)
             
-        births = int(BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP)
+        births = int(round(BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP,0))
         rand = int(np.random.normal(0, int(births * 0.05)))
         
         births += rand

@@ -1,5 +1,4 @@
 import Parser
-import DataGenerator
 from Population import Population
 
 def test(pop_a, pop_b, num_years):
@@ -46,7 +45,7 @@ def test(pop_a, pop_b, num_years):
 
 def init_mun_pombal_population(data, year):
     age_dist = data[year]
-    population = Population(1)
+    population = Population()
     for (a, b) in age_dist:
         num = age_dist[(a,b)]
         if b == 89:

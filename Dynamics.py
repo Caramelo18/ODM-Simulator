@@ -188,8 +188,6 @@ class Dynamics:
 
 
     def get_od_matrix(self):
-        self.init_od_matrix()
-
         self.fill_matrix_students()
         self.fill_matrix_workers()
 
