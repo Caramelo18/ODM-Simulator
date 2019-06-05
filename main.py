@@ -1,12 +1,9 @@
-from Person import Person
 from Population import Population
 from Stats import Stats
-from random import randint
 import PopulationGenerator
 import Parser
-import matplotlib.pyplot as plt
 
-NUM_STEPS = 5
+NUM_STEPS = 1
 
 def simulate(population):
     for _ in range(NUM_STEPS):

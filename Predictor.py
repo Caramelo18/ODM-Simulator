@@ -16,9 +16,12 @@ class Predictor:
 
         self.mortality_offset = 1000000
     
-    def init_mortality_predictor(self):
-        mortality_data = Parser.get_mortality_data_2011_2018()
-        mortality_data.pop(2018, None)
+    def init_mortality_predictor(self, custom_mortality):
+        mortality_data = custom_mortality
+
+        if mortality_data is None:
+            mortality_data = Parser.get_mortality_data_2011_2018()
+            mortality_data.pop(2018, None)
         population_data = Parser.get_population_data()
 
         mortality_data = list(mortality_data.values())

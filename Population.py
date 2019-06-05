@@ -16,10 +16,7 @@ DEATHS_PER_YEAR = 183
 DEATHS_PER_YEAR_M = 99
 DEATHS_PER_YEAR_F = 84
 
-# Data from 2017 for "Pombal" municipality - use yearly data because fluctuations during months
-BIRTHS_PER_YEAR = 336
-BIRTHS_PER_YEAR_M = 166
-BIRTHS_PER_YEAR_F = 170
+
 
 # Data from 2011 to 2017 for "Pombal" municipality
 MIGRATORY_BALANCE = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015': 161, '2016': -217, '2017': -250}
@@ -39,6 +36,11 @@ FREG_POMB_POP = 17187
 BIRTH_RANGES = [(10,14), (15,19), (20,24), (25,29), (30,34), (35,39), (40,44), (45,49), (50,120)]
 
 class Population:
+    # Data from 2017 for "Pombal" municipality - use yearly data because fluctuations during months
+    BIRTHS_PER_YEAR = 336
+    BIRTHS_PER_YEAR_M = 166
+    BIRTHS_PER_YEAR_F = 170
+
     def __init__(self):
         self.persons = []
         self.zones = []
@@ -106,9 +108,9 @@ class Population:
         
         self.migrations_distribution = dist
     
-    def train_predictiors(self):
+    def train_predictiors(self, custom_mortality=None):
         print("Initializing predictors")
-        self.predictor.init_mortality_predictor()
+        self.predictor.init_mortality_predictor(custom_mortality)
         # self.predictor.init_natality_predictor()
         self.predictor.init_migration_predictor()
 
@@ -195,7 +197,7 @@ class Population:
             print("ERROR: No natality data loaded")
             exit(1)
             
-        births = int(round(BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP,0))
+        births = int(round(self.BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP,0))
         rand = int(np.random.normal(0, int(births * 0.05)))
         
         births += rand
