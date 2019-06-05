@@ -45,9 +45,11 @@ class Population:
         self.persons = []
         self.zones = []
         self.step_num = 0
-        self.dynamics = Dynamics(self)
         self.stats = Stats(self)
         self.predictor = Predictor()
+    
+    def init_dynamics(self, student_surveys='registo-od-generated-students.xlsx', workers_survey='registo-od-generated-workers.xlsx'):
+        self.dynamics = Dynamics(self, student_surveys=student_surveys, worker_surveys=workers_survey)
 
     def get_dynamics(self):
         self.dynamics.get_persons_by_class_and_zone(PersonClass.CLASS3, 57)

@@ -15,7 +15,7 @@ def get_resize_ratio():
 
     return ratio
 
-def init_population_census_2011():
+def init_population_census_2011(custom_origin_index=None):
     print("Initializing population")
 
     filepath = basepath + "pombal-detailed.csv"
@@ -42,6 +42,8 @@ def init_population_census_2011():
     
     for _, row in df.iterrows():
         lugar = row['Localidade']
+        if custom_origin_index is not None:
+            lugar = zones[custom_origin_index]
         for i in range(len(AGE_RANGES) - 2):
             key = AGE_RANGES[i]
             (a, b) = AGE_RANGES_NUM[i]

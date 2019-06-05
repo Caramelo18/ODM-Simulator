@@ -10,7 +10,12 @@ import PopulationGenerator
 basepath = 'data/' 
 
 class SurveyGenerator:
-    def __init__(self):
+    def __init__(self, schools_list = "schools.csv", workplaces_list = "workplaces.csv", students_filepath = "registo-od-generated-students.xlsx", workers_filepath = "registo-od-generated-workers.xlsx"):
+        self.schools_list = schools_list
+        self.workplaces_list = workplaces_list
+        self.students_filepath = basepath + students_filepath
+        self.workers_filepath = basepath + workers_filepath 
+        
         self.init_shapefile()
         self.schools = {'ESC1': [], 'ESC2': [], 'ESC3': [], 'ESCSEC': []}
         self.workplaces = {'Primary': [], 'Secondary': [], 'Tertiary': []}
@@ -44,9 +49,10 @@ class SurveyGenerator:
         return zone
 
     def read_schools(self):
-        filepath = basepath + "schools.csv"
-        df = pandas.read_csv(filepath)
+        filepath = basepath + self.schools_list
 
+        df = pandas.read_csv(filepath)
+        
         for _, row in df.iterrows():
             lat = row['Lat']
             lon = row['Lon']
@@ -61,7 +67,7 @@ class SurveyGenerator:
         # print(self.schools, len(self.schools))
 
     def read_workplaces(self):
-        filepath = basepath + "workplaces.csv"
+        filepath = basepath + self.workplaces_list
         df = pandas.read_csv(filepath)
 
         for _, row in df.iterrows():
@@ -123,7 +129,6 @@ class SurveyGenerator:
 
     def fill_students_surveys(self):
         print("Generating students surveys")
-        filepath = basepath + "registo-od-generated-students.xlsx"
 
         row_list = []
 
@@ -147,13 +152,11 @@ class SurveyGenerator:
 
         df = pandas.DataFrame(row_list, columns=students_columns)
 
-        with ExcelWriter(filepath) as writer:
+        with ExcelWriter(self.students_filepath) as writer:
             df.to_excel(writer)
 
     def fill_workers_surveys(self):
         print("Generating workers surveys")
-
-        filepath = basepath + "registo-od-generated-workers.xlsx"
 
         row_list = []
 
@@ -176,7 +179,7 @@ class SurveyGenerator:
 
         df = pandas.DataFrame(row_list, columns=workers_columns)
 
-        with ExcelWriter(filepath) as writer:
+        with ExcelWriter(self.workers_filepath) as writer:
             df.to_excel(writer)
 
     def generate_zone_schools(self):
@@ -226,4 +229,4 @@ class SurveyGenerator:
         elif size is 4:
             return 200
 
-survey_generator = SurveyGenerator()
+# survey_generator = SurveyGenerator()

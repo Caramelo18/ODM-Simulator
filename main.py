@@ -3,7 +3,7 @@ from Stats import Stats
 import PopulationGenerator
 import Parser
 
-NUM_STEPS = 1
+NUM_STEPS = 5
 
 def simulate(population):
     for _ in range(NUM_STEPS):
@@ -17,6 +17,7 @@ def main():
     migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
 
     population = PopulationGenerator.init_population_census_2011()
+    population.init_dynamics()
     population.set_mortality(mortality_data)
     population.set_natality(natality_data)
     population.set_migrations(migrations_ages)

@@ -9,15 +9,15 @@ import sys
 basepath = 'data/'
 
 class Dynamics:
-    def __init__(self, population):
+    def __init__(self, population, student_surveys, worker_surveys):
         self.population = population
         self.zones = []
         self.shapefile_helper = ShapefileHelper()
         
         np.set_printoptions(threshold=np.inf, linewidth=250)
 
-        self.read_student_surveys('registo-od-generated-students.xlsx')
-        self.read_workers_surveys('registo-od-generated-workers.xlsx')
+        self.read_student_surveys(student_surveys)
+        self.read_workers_surveys(worker_surveys)
          
     def get_persons_by_class_and_zone(self, person_class, origin_zone):
         persons = []
