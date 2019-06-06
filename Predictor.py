@@ -8,9 +8,8 @@ import numpy as np
 class Predictor:
     def __init__(self):
         self.mortality_predictor = linear_model.ARDRegression()
-        #Lasso - 0.76
-        #ADR   - 0.85
-        self.natality_predictor = linear_model.BayesianRidge()
+        
+        self.natality_predictor = linear_model.Lars()
 
         self.migration_predictor = linear_model.LinearRegression()
 
@@ -52,11 +51,10 @@ class Predictor:
         
         self.evaluate_mortality(population_data, mortality_data)
 
-    def init_natality_predictor(self):
+    def init_natality_predictor_ages(self):
         natality_data = Parser.get_natality_data_2011_2018()
         natality_data.pop(2018, None)
         population_data = Parser.get_population_data()
-
 
         natality_data = list(natality_data.values())
         population_data = list(population_data.values())
@@ -70,7 +68,6 @@ class Predictor:
             rng = list(val.values())
             # rng = [x / sum(rng) for x in rng]
             pop_data.append(rng)
-
 
         natality_data = np.array(natality_data)
         population_data = np.array(pop_data).astype(float)
@@ -88,7 +85,32 @@ class Predictor:
 
         
         self.evaluate_natality(population_data, natality_data)
-    
+
+    def init_natality_predictor(self):
+        population_data = Parser.get_population_data()
+        total_population = []
+        for year in population_data:
+            total_population.append(sum(population_data[year].values()))
+        total_population.reverse()
+
+        natality_data = Parser.get_natality_data_2011_2018()
+        natality_data.pop(2018, None)
+        
+        x = np.arange(len(natality_data.keys()))
+        x = x[:, np.newaxis]
+        y = list(natality_data.values())
+        y.reverse()
+
+        for i in range(len(y)):
+            births = y[i]
+            pop = total_population[i]
+            y[i] = births / pop 
+
+        self.natality_predictor.fit(x, y)
+
+        self.natality_tick = len(x)
+        self.evaluate_natality(x, y)
+
     def init_migration_predictor(self):
         balances = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015': 161, '2016': -217, '2017': -250}
         #TODO: remove 2015?!
@@ -110,7 +132,7 @@ class Predictor:
                 
         self.migration_predictor.fit(x, y)
         
-        self.tick = len(x) 
+        self.migration_tick = len(x) 
         self.evaluate_migrations(x, y)
     
     def predict_mortality(self, age_distribution):
@@ -121,12 +143,24 @@ class Predictor:
         # print("Predicted Mortality: ", pred)
         return pred
 
+    def predict_natality(self, population_number):
+        x = np.asarray([self.natality_tick])
+        x = x[:, np.newaxis]
+
+        result = self.natality_predictor.predict(x)
+        self.natality_tick += 1
+        
+        result = int(round(result[0] * population_number, 0))
+        
+        return result
+
+
     def predict_migrations(self, population_number):
-        x = np.asarray([self.tick])
+        x = np.asarray([self.migration_tick])
         x = x[:, np.newaxis]
         
         result = self.migration_predictor.predict(x)
-        self.tick += 1
+        self.migration_tick += 1
         
         result = int(round(result[0] * population_number, 0))
         return result
@@ -137,11 +171,15 @@ class Predictor:
 
         print("Mortality R2 Score:", score)
         
-    def evaluate_natality(self, population_data, natality_data):
+    def evaluate_natality_ages(self, population_data, natality_data):
         pred = cross_val_predict(self.natality_predictor, population_data, natality_data, cv=7)
         score = r2_score(natality_data, pred)
         
         print("Natality R2 Score:", score)
+    
+    def evaluate_natality(self, x, y):
+        score = self.natality_predictor.score(x, y)
+        print("Natality R2 Score", score)
 
     def evaluate_migrations(self, x, y):
         score = self.migration_predictor.score(x, y)

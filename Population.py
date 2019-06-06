@@ -112,7 +112,7 @@ class Population:
     def train_predictiors(self, custom_mortality=None):
         print("Initializing predictors")
         self.predictor.init_mortality_predictor(custom_mortality)
-        # self.predictor.init_natality_predictor()
+        self.predictor.init_natality_predictor()
         self.predictor.init_migration_predictor()
 
     def add_person(self, person):
@@ -198,10 +198,7 @@ class Population:
             print("ERROR: No natality data loaded")
             exit(1)
             
-        births = int(round(self.BIRTHS_PER_YEAR * self.get_population_size() / MUN_POMB_POP,0))
-        rand = int(np.random.normal(0, int(births * 0.05)))
-        
-        births += rand
+        births = self.predictor.predict_natality(self.get_population_size())
         
         newborns_places = []
         mothers_ages = []
