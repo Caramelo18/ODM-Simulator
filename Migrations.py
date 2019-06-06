@@ -67,7 +67,7 @@ print(artificial_population.get_population_age_distribution())
 
 
 num_years = 0
-for year in range(2011, 2018):
+for year in range(2011, 2017):
     num_years += 1
     num_births = pombal_natality[year]
     num_deaths = pombal_mortality[year]

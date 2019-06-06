@@ -15,7 +15,7 @@ class Distribution(object):
     
     def __init__(self,dist_names_list = [], custom_dist = True, in_range = True):
         if custom_dist:
-            self.dist_names = ["genlogistic", "johnsonsu", "moyal"]
+            self.dist_names = ["genlogistic", "johnsonsu", "moyal", "fisk"]
         else:
             self.dist_names = [d for d in dir(scipy.stats) if isinstance(getattr(scipy.stats, d), scipy.stats.rv_continuous)] # ['norm','lognorm','expon']
             
@@ -37,7 +37,7 @@ class Distribution(object):
     def Fit(self, y):
         warnings.filterwarnings("ignore", category=RuntimeWarning)
         warnings.filterwarnings("ignore", category=DeprecationWarning)
-
+        
         self.dist_results = []
         self.params = {}
         for dist_name in self.dist_names:

@@ -14,8 +14,9 @@ def main():
     print("Loading natality and mortality data")
     mortality_data = Parser.get_mortality_data()
     natality_data = Parser.get_natality_data()
-    migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
-
+    # migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
+    migrations_ages = [0, 0, 0, 0, 107, 122, 153, 169, 0, 82, 99, 0, 0, 0, 0, 0, 0, 0]
+    
     population = PopulationGenerator.init_population_census_2011()
     population.init_dynamics()
     population.set_mortality(mortality_data)

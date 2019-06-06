@@ -81,7 +81,7 @@ def custom_population_origin_test():
 
 def custom_popualation_schools_test():
     students_filepath = "fake-students-survey.xlsx"
-    survey_generator = SurveyGenerator(schools_list="schools-outeiro-das-galegas.csv", students_filepath=students_filepath)
+    _ = SurveyGenerator(schools_list="schools-outeiro-das-galegas.csv", students_filepath=students_filepath)
 
     mortality_data = Parser.get_mortality_data()
     natality_data = Parser.get_natality_data()
@@ -99,7 +99,7 @@ def custom_popualation_schools_test():
 
 def custom_popualation_workplaces_test():
     workers_filepath = "fake-workers-survey.xlsx"
-    survey_generator = SurveyGenerator(workplaces_list="workplaces-aldeia-redondos.csv", workers_filepath=workers_filepath)
+    _ = SurveyGenerator(workplaces_list="workplaces-aldeia-redondos.csv", workers_filepath=workers_filepath)
 
     mortality_data = Parser.get_mortality_data()
     natality_data = Parser.get_natality_data()

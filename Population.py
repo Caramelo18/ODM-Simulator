@@ -51,9 +51,6 @@ class Population:
     def init_dynamics(self, student_surveys='registo-od-generated-students.xlsx', workers_survey='registo-od-generated-workers.xlsx'):
         self.dynamics = Dynamics(self, student_surveys=student_surveys, worker_surveys=workers_survey)
 
-    def get_dynamics(self):
-        self.dynamics.get_persons_by_class_and_zone(PersonClass.CLASS3, 57)
-
     def get_persons(self):
         return self.persons
     
@@ -104,8 +101,10 @@ class Population:
             num = data[i]
             for _ in range(num):
                 r.append(i)
-
-        dist = Distribution(in_range=False)
+                
+        dist = Distribution()
+        dist.min_val = 0
+        dist.max_val = len(data) - 1
         dist.Fit(r)
         
         self.migrations_distribution = dist
@@ -297,22 +296,3 @@ class Population:
         
         return info
         
-    
-    def get_odm(self):
-        od = [[0 for i in range(self.num_places + 1)] for j in range(self.num_places + 1)]
-
-        for i in range(len(od)):
-            od[0][i] = i
-            od[i][0] = i
-
-        for person in self.persons:
-            origin = person.get_origin()
-            destination = person.get_destination()
-            od[origin][destination] += 1
-            
-        # for line in od:
-        #     print(line)
-    
-        plt.imshow(od, interpolation='nearest')
-        plt.show()
-
