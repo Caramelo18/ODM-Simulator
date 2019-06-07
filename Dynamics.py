@@ -186,7 +186,11 @@ class Dynamics:
 
         self.save_matrices_to_csv(step=step)
 
+        matrices = self.matrices
+
         self.reset_matrices()
+        
+        return matrices
 
     def get_zone_index(self, zone):
         return self.zones.index(zone)
@@ -232,6 +236,7 @@ class Dynamics:
             aggregate_matrix = np.add(aggregate_matrix, self.matrices[matrix_type], dtype=int)
             pandas.DataFrame(self.matrices[matrix_type], index=labels, columns=labels).to_csv(filename)
         
+        self.matrices['AGG'] =  aggregate_matrix
         filename = filepath.format('aggregate')
         pandas.DataFrame(aggregate_matrix, index=labels, columns=labels).to_csv(filename)
     

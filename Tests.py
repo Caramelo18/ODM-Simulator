@@ -1,15 +1,20 @@
 from Population import Population
 from Stats import Stats
 from SurveyGenerator import SurveyGenerator
+from pandas import pandas
 import PopulationGenerator
 import Parser
+import numpy as np
 
-NUM_STEPS = 5
+NUM_STEPS = 3
 
 def simulate(population):
-    for _ in range(NUM_STEPS):
+    resulting_matrices = {}
+    for i in range(NUM_STEPS):
         population.step()
-        population.dynamics.get_od_matrix(step=population.step_num)
+        matrices = population.dynamics.get_od_matrix(step=population.step_num)
+        resulting_matrices[i+1] = matrices
+    matrices_info(resulting_matrices)     
 
 def control_test():
     mortality_data = Parser.get_mortality_data()
@@ -31,12 +36,18 @@ def double_natality_test():
 
     migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
 
+    natality_data = Parser.get_natality_data_2011_2018()
+    natality_data.pop(2018, None)
+
+    for year in natality_data:
+        natality_data[year] *= 2
+
     population = PopulationGenerator.init_population_census_2011()
     population.init_dynamics()
     population.set_mortality(mortality_data)
     population.set_natality(natality_data)
     population.set_migrations(migrations_ages)
-    population.train_predictiors()
+    population.train_predictiors(custom_natality=natality_data)
     population.BIRTHS_PER_YEAR = population.BIRTHS_PER_YEAR * 2
     
     simulate(population)
@@ -114,7 +125,25 @@ def custom_popualation_workplaces_test():
     
     simulate(population)
 
-# control_test()
+def matrices_info(matrices):
+    to_csv = []
+    
+    for step in matrices:
+        for mat_type in matrices[step]:
+            matrix = matrices[step][mat_type]
+            size = len(matrix) - 1
+            destinations = list(matrix[size])
+            origins = list(matrix[:,size])
+            label = "STEP{}-{}".format(step, mat_type)
+            org_row = [label + "-ORG"]
+            dest_row = [label + "-DEST"]
+            org_row = org_row + origins
+            dest_row = dest_row +  destinations
+            to_csv.append(org_row)
+            to_csv.append(dest_row) 
+    pandas.DataFrame(to_csv).to_csv("teste.csv", header=None, index=None)
+
+control_test()
 # double_natality_test()
 # double_mortality_test()
 # custom_population_origin_test()

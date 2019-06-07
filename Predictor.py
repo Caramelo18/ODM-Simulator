@@ -54,6 +54,7 @@ class Predictor:
     def init_natality_predictor_ages(self):
         natality_data = Parser.get_natality_data_2011_2018()
         natality_data.pop(2018, None)
+
         population_data = Parser.get_population_data()
 
         natality_data = list(natality_data.values())
@@ -86,15 +87,18 @@ class Predictor:
         
         self.evaluate_natality(population_data, natality_data)
 
-    def init_natality_predictor(self):
+    def init_natality_predictor(self, custom_natality):
         population_data = Parser.get_population_data()
         total_population = []
         for year in population_data:
             total_population.append(sum(population_data[year].values()))
         total_population.reverse()
 
-        natality_data = Parser.get_natality_data_2011_2018()
-        natality_data.pop(2018, None)
+        natality_data = custom_natality
+        
+        if natality_data is None:
+            natality_data = Parser.get_natality_data_2011_2018()
+            natality_data.pop(2018, None)
         
         x = np.arange(len(natality_data.keys()))
         x = x[:, np.newaxis]

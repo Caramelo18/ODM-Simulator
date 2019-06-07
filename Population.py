@@ -109,10 +109,10 @@ class Population:
         
         self.migrations_distribution = dist
     
-    def train_predictiors(self, custom_mortality=None):
+    def train_predictiors(self, custom_mortality=None, custom_natality=None):
         print("Initializing predictors")
         self.predictor.init_mortality_predictor(custom_mortality)
-        self.predictor.init_natality_predictor()
+        self.predictor.init_natality_predictor(custom_natality)
         self.predictor.init_migration_predictor()
 
     def add_person(self, person):
@@ -209,10 +209,9 @@ class Population:
             (min_age, max_age) = BIRTH_RANGES[age_range]
             mother = self.get_random_person_in_age_range(min_age, max_age)
             mother_place = mother.get_origin()
-            destination = 32
             newborns_places.append(mother_place)
             mothers_ages.append(mother.get_age())
-            person = Person(mother_place, destination, PersonClass.CLASS1, 0)
+            person = Person(mother_place, person_class = PersonClass.CLASS1, age = 0)
             self.add_person(person)
 
         self.stats.add_natality_stats(self.step_num, {'places': newborns_places, 'ages': mothers_ages})
