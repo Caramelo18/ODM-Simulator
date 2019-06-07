@@ -6,7 +6,7 @@ import PopulationGenerator
 import Parser
 import numpy as np
 
-NUM_STEPS = 3
+NUM_STEPS = 5
 
 def simulate(population):
     resulting_matrices = {}
@@ -127,7 +127,8 @@ def custom_popualation_workplaces_test():
 
 def matrices_info(matrices):
     to_csv = []
-    
+    origins_data = []
+    dests_data = []
     for step in matrices:
         for mat_type in matrices[step]:
             matrix = matrices[step][mat_type]
@@ -139,13 +140,15 @@ def matrices_info(matrices):
             dest_row = [label + "-DEST"]
             org_row = org_row + origins
             dest_row = dest_row +  destinations
-            to_csv.append(org_row)
-            to_csv.append(dest_row) 
+            origins_data.append(org_row)
+            dests_data.append(dest_row)
+
+    to_csv = origins_data +  dests_data
     pandas.DataFrame(to_csv).to_csv("teste.csv", header=None, index=None)
 
-control_test()
+# control_test()
 # double_natality_test()
 # double_mortality_test()
 # custom_population_origin_test()
 # custom_popualation_schools_test()
-# custom_popualation_workplaces_test()
+custom_popualation_workplaces_test()
