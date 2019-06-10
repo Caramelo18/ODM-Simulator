@@ -152,8 +152,28 @@ def get_mortality_data_2011_2018():
 
     # print(data)
     return data
-        
+
+def get_unemployment_rates():
+    soup = BeautifulSoup(open("data/desemprego.html"), 'html.parser')
+    
+    table = soup.find_all(class_="dados")[0]
+    table = table.find("tbody")
+    table = table.find_all(class_=["TRow1", "TRow0"]) 
+
+    data = {}
+    age_ranges = [(18, 24), (25,34), (35, 44), (44, 65)]
+
+    table = table[0].find_all("td")[2:]
+
+    for i in range(len(table)):
+        key = age_ranges[i]
+        val = table[i].text
+        val = val.replace(",", ".")
+        data[key] = float(val)
+    
+    return data
 
 # get_population_data()
 # get_natality_data_2011_2018()
-get_mortality_data_2011_2018()
+# get_mortality_data_2011_2018()
+# get_unemployment_rates()

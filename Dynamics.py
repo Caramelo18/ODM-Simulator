@@ -1,10 +1,12 @@
 from collections import Counter
 from pandas import pandas
 from ShapefileHelper import ShapefileHelper
+from Distribution import Distribution
 import numpy as np
 import copy
 import random
 import sys
+import Parser
 
 basepath = 'data/'
 
@@ -18,7 +20,9 @@ class Dynamics:
 
         self.read_student_surveys(student_surveys)
         self.read_workers_surveys(worker_surveys)
-         
+
+        self.load_unemployment()
+             
     def read_student_surveys(self, filename):
         filepath = basepath + filename
         
@@ -59,6 +63,20 @@ class Dynamics:
 
         self.process_workers_data()
 
+    def load_unemployment(self):
+        data = Parser.get_unemployment_rates()
+
+        # r = []
+        # for (a, b) in data:
+        #     unemployment = int(round(data[(a,b)],0))
+        #     for i in range(unemployment):
+        #         for age in range(a,b+1):
+        #             r.append(age)
+        
+        # dist = Distribution(custom_dist=False)
+        # dist.Fit(r)
+        # dist.Plot(r)
+        self.unemployment_rates = data
 
     def process_students_data(self):
         schools_distribution = {}
@@ -167,6 +185,8 @@ class Dynamics:
         for person in self.population.get_persons():
             age = person.get_age()
             if age > 19 and age < 65:
+                if not self.is_employed(age):
+                    continue
                 origin = person.get_origin()
                 origin_index = self.get_zone_index(origin)
 
@@ -251,3 +271,18 @@ class Dynamics:
             return 'ESCSEC'
         else:
             return None
+    
+    def is_employed(self, age):
+        perc = None
+
+        for (a, b) in self.unemployment_rates:
+            if age >= a and age <= b:
+                perc = self.unemployment_rates[(a,b)]
+
+        perc /= 100
+
+        rand = random.random()
+
+        employed = perc <= rand
+        
+        return employed
