@@ -86,7 +86,7 @@ class Population:
             key = list(data.keys())[i]
             num = int(data[key])
             for _ in range(num):
-                r.append(i + 1)
+                r.append(i)
 
         dist = Distribution()
         dist.Fit(r)
