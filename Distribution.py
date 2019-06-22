@@ -18,6 +18,7 @@ class Distribution(object):
             self.dist_names = ["genlogistic", "johnsonsu", "gennorm"]
         else:
             self.dist_names = [d for d in dir(scipy.stats) if isinstance(getattr(scipy.stats, d), scipy.stats.rv_continuous)] # ['norm','lognorm','expon']
+            self.dist_names.remove("levy_stable")
             
         self.dist_results = []
         self.params = {}
@@ -41,6 +42,7 @@ class Distribution(object):
         self.params = {}
         for dist_name in self.dist_names:
             dist = getattr(scipy.stats, dist_name)
+            # print("fitting", dist_name)
             param = dist.fit(y)
             
             self.params[dist_name] = param

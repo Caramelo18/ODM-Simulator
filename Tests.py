@@ -14,7 +14,8 @@ def simulate(population):
         population.step()
         matrices = population.dynamics.get_od_matrix(step=population.step_num)
         resulting_matrices[i+1] = matrices
-    matrices_info(resulting_matrices)     
+    # matrices_info(resulting_matrices)
+    # age_dist(population)
 
 def control_test():
     mortality_data = Parser.get_mortality_data()
@@ -125,6 +126,23 @@ def custom_popualation_workplaces_test():
     
     simulate(population)
 
+def flatten_mortality_test():
+    mortality_data = Parser.get_mortality_data()
+    for age in mortality_data:
+        mortality_data[age] = 20
+    
+    natality_data = Parser.get_natality_data()
+    migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
+
+    population = PopulationGenerator.init_population_census_2011()
+    population.init_dynamics()
+    population.set_mortality(mortality_data) # BEST = "ksone"
+    population.set_natality(natality_data)
+    population.set_migrations(migrations_ages)
+    population.train_predictiors()
+    
+    simulate(population)
+
 def matrices_info(matrices):
     to_csv = []
     origins_data = []
@@ -146,9 +164,23 @@ def matrices_info(matrices):
     to_csv = origins_data +  dests_data
     pandas.DataFrame(to_csv).to_csv("teste.csv", header=None, index=None)
 
+def age_dist(population):
+    age_distributions = population.stats.age_distributions
+    
+    to_csv = []
+    for step in age_distributions:
+        dist = age_distributions[step]
+        label = "STEP{}".format(step)
+        label = [label]
+        row = label + dist
+        to_csv.append(row)
+
+    pandas.DataFrame(to_csv).to_csv("age_dists.csv", header=None, index=None)
+
 # control_test()
 # double_natality_test()
 # double_mortality_test()
 # custom_population_origin_test()
 # custom_popualation_schools_test()
-custom_popualation_workplaces_test()
+# custom_popualation_workplaces_test()
+flatten_mortality_test()

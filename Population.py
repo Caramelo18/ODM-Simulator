@@ -71,7 +71,7 @@ class Population:
             deaths = mortality_data[i]
             for _ in range(deaths):
                 r.append(i)
-                
+
         dist = Distribution()
         dist.Fit(r)
 
