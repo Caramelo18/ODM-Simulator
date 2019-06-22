@@ -115,9 +115,11 @@ class Predictor:
         self.natality_tick = len(x)
         self.evaluate_natality(x, y)
 
-    def init_migration_predictor(self):
-        balances = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015': 161, '2016': -217, '2017': -250}
-        #TODO: remove 2015?!
+    def init_migration_predictor(self, custom_migrations):
+        balances = custom_migrations
+        
+        if balances is None:
+            balances = {'2011': -109, '2012': -91, '2013': -82, '2014': -99, '2015': 161, '2016': -217, '2017': -250}
 
         population_data = Parser.get_population_data()
         total_population = []

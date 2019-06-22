@@ -3,7 +3,7 @@ from Enums import *
 import numpy as np
 
 class Person:
-    def __init__(self, origin, person_class, destination=None, age=None):
+    def __init__(self, origin, person_class=None, destination=None, age=None):
         self.origin = origin
         self.destination = destination
         self.person_class = person_class

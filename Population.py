@@ -109,11 +109,11 @@ class Population:
         
         self.migrations_distribution = dist
     
-    def train_predictiors(self, custom_mortality=None, custom_natality=None):
+    def train_predictiors(self, custom_mortality=None, custom_natality=None, custom_migrations=None):
         print("Initializing predictors")
         self.predictor.init_mortality_predictor(custom_mortality)
         self.predictor.init_natality_predictor(custom_natality)
-        self.predictor.init_migration_predictor()
+        self.predictor.init_migration_predictor(custom_migrations)
 
     def add_person(self, person):
         self.persons.append(person)
@@ -220,9 +220,9 @@ class Population:
 
     def simulate_migrations(self):
         num_persons_out = self.predictor.predict_migrations(self.get_population_size())
-        num_persons_out = abs(num_persons_out)
+        num_persons_out_abs = abs(num_persons_out)
         
-        migration_age_ranges = self.migrations_distribution.Random(n=num_persons_out)
+        migration_age_ranges = self.migrations_distribution.Random(n=num_persons_out_abs)
         age_ranges = Parser.get_age_ranges()
 
         outcome_ages = []
@@ -235,14 +235,22 @@ class Population:
                 age_range = migration_age_ranges[i]
 
             (a, b) = age_ranges[age_range]
-            
-            person = self.get_random_person_in_age_range(a, b)
-            outcome_ages.append(person.get_age())
-            self.remove_person(person)
+            if num_persons_out < 0:
+                person = self.get_random_person_in_age_range(a, b)
+                outcome_ages.append(person.get_age())
+                self.remove_person(person)
+            elif num_persons_out > 0:
+                age = randint(a, b)
+                zone = randint(0, len(self.zones) - 1)
+                zone = self.zones[34]
+                person = Person(origin=zone, age=age)
+                self.add_person(person)
 
         self.stats.add_migration_stats(self.step_num, outcome_ages)
-
-        print("Step {} - {} persons left".format(self.step_num, num_persons_out))
+        if num_persons_out < 0:
+            print("Step {} - {} persons left".format(self.step_num, num_persons_out_abs))
+        elif num_persons_out > 0:
+            print("Step {} - {} persons entered".format(self.step_num, num_persons_out_abs))
 
     def get_random_person_by_age(self, age):
         possible_persons = []

@@ -143,6 +143,22 @@ def flatten_mortality_test():
     
     simulate(population)
 
+def invert_migrations_test():
+    mortality_data = Parser.get_mortality_data()
+    natality_data = Parser.get_natality_data()
+    migrations_ages = [0, 0, 0, 0, 111, 44, 206, 71, 0, 28, 49, 0, 75, 0, 0, 0, 0, 0]
+
+    migration_balances = {'2011': 109, '2012': 91, '2013': 82, '2014': 99, '2015': -161, '2016': 217, '2017': 250}
+
+    population = PopulationGenerator.init_population_census_2011()
+    population.init_dynamics()
+    population.set_mortality(mortality_data)
+    population.set_natality(natality_data)
+    population.set_migrations(migrations_ages)
+    population.train_predictiors(custom_migrations=migration_balances)
+    
+    simulate(population)
+
 def matrices_info(matrices):
     to_csv = []
     origins_data = []
@@ -183,4 +199,5 @@ def age_dist(population):
 # custom_population_origin_test()
 # custom_popualation_schools_test()
 # custom_popualation_workplaces_test()
-flatten_mortality_test()
+# flatten_mortality_test()
+# invert_migrations_test()
