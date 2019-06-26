@@ -241,8 +241,8 @@ class Population:
                 self.remove_person(person)
             elif num_persons_out > 0:
                 age = randint(a, b)
-                zone = randint(0, len(self.zones) - 1)
-                zone = self.zones[34]
+                (zones, probabilites) = self.get_age_group_zone_distribution(a, b)
+                zone = random.choices(zones, weights=probabilites, k = 1)[0]
                 person = Person(origin=zone, age=age)
                 self.add_person(person)
 
@@ -277,6 +277,27 @@ class Population:
             return None
 
         return possible_persons[0]
+
+    def get_age_group_zone_distribution(self, min_age, max_age):
+        zones = {}
+
+        for person in self.persons:
+            if person.get_age() >= min_age and person.get_age() <= max_age:
+                origin = person.get_origin()
+                if origin in zones:
+                    zones[origin] += 1
+                else:
+                    zones[origin] = 1
+
+        total = sum(zones.values())
+
+        for origin in zones:
+            zones[origin] /= total
+
+        zones_list = list(zones.keys())
+        probabilites = list(zones.values())
+        
+        return (zones_list, probabilites)
     
     def get_num_persons_in_age_range(self, min_age, max_age):
         possible_persons = []
